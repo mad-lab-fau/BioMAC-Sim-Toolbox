@@ -1,0 +1,14 @@
+image: alpine
+
+pages:
+  tags:
+  - docker
+  script:
+  - apk update && apk add doxygen perl sed
+  - cd docs/Doxygen && ./build_docs.sh && cd ../../
+  - mv docs/Doxygen/Doxygen_HTML/ public/
+  artifacts:
+    paths:
+    - public
+  only:
+  - OO_Coding
