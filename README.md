@@ -1,4 +1,4 @@
-Instruction to start using the toolbox
+Instruction to start using the BioMAC-Sim-Toolbox. Extended documentation can be found here: https://mad-lab-fau.github.io/BioMAC-Sim-Toolbox/
 
 1. Make sure that you have compiler installed. For instructions, see here: https://nl.mathworks.com/matlabcentral/answers/311290-faq-how-do-i-install-the-mingw-compiler
 2. Install IPOPT. For example, you can install it by installing the following version through the Add-On Explorer in MATLAB: https://github.com/ebertolazzi/mexIPOPT. To do so, go to the "Apps" tab, click "Get More Apps" in top left to open the Add-On Explorer, then search for "IPOPT" and click "Add" on the top right. 
