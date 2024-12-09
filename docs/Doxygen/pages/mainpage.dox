@@ -9,7 +9,7 @@
  *
  */
 
-/** @mainpage  Welcome to the documentation of the biomechanical motion analasys and creation (BioMAC) simulation toolbox. 
+/** @mainpage  Welcome to the documentation of the biomechanical motion analysis and creation (BioMAC) simulation toolbox. 
  * @image html  running.png
  This toolbox was created by researchers from the <a href="https://www.mad.tf.fau.de/">Machine Learning and Data Analytics</a> Lab and the <a href="https://www.asm.tf.fau.de/en/startseite/research/biomac/">Biomechanical Motion Analysis and Creation Group</a> at Friedrich-Alexander-Universit&auml;t Erlangen-N&uuml;rnberg in Erlangen, Germany and by researchers from the former Parker-Hannifin Laboratory for Human Motion and Control at Cleveland State University, Cleveland, Ohio, USA.
 */ 
