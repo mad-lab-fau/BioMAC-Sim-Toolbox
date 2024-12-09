@@ -1,5 +1,5 @@
 ---
-title: 'BioMAC-Sim-Toolbox: A MATLAB toolbox for human movement simulation and analysis'
+title: 'BioMAC-Sim-Toolbox: A MATLAB toolbox for biomechanical motion analysis and creation through simulation'
 tags:
   - MATLAB
   - Biomechanics
