@@ -1,5 +1,5 @@
 ---
-title: 'Biomech-Sim-Toolbox: A MATLAB toolbox for human movement simulation and analysis'
+title: 'BioMAC-Sim-Toolbox: A MATLAB toolbox for human movement simulation and analysis'
 tags:
   - MATLAB
   - Biomechanics
@@ -57,7 +57,7 @@ On the one hand, we can use so-called predictive simulations [@ackermann:2010; @
 On the other hand, we can use so-called reconstructive simulations to estimate variables that cannot or were not measured directly by minimizing a data tracking error [@dorschky:2019a;@nitschke:2023;@nitschke:2024]. Such wide-spread measurements and their biomechanical analysis are vital to be able to 
 reach this understanding of human movement.
 
-Here, we present `Biomech-Sim-Toolbox`, a MATLAB toolbox that can be used to create simulations of human movement 
+Here, we present `BioMAC-Sim-Toolbox`, a MATLAB toolbox that can be used to create simulations of human movement 
 and analyse human movements. The main functionality of the toolbox is that it solves trajectory optimization problems, or optimal control problems, for human musculoskeletal dynamics models. These dynamics models combine multibody 
 dynamics to model the movements of the skeleton with muscle dynamics models to model the dynamics of muscular 
 contraction and activation. In the trajectory optimization problem, the muscle stimulations are found that minimize an objective. This objective generally includes terms to minimize muscular effort and to minimize a tracking error
@@ -138,7 +138,7 @@ Figure sizes can be customized by adding an optional second parameter:
 
 # Acknowledgements
 
-We acknowledge contributions from Marko Ackermann, Dieter Heinrich, Maria Eleni Athanasiadou, Chuyi Wang, Christopher Löffelmann, Linus Hötzel, Utkarsha Shukla, Tobias Luckfiel, Heiko Schlarb. The development of the Biomech-Sim-Toolbox was supported by adidas AG and by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) through Project-ID442419336, SFB 1483 - EmpkinS and through Project-ID520189992
+We acknowledge contributions from Marko Ackermann, Dieter Heinrich, Maria Eleni Athanasiadou, Chuyi Wang, Christopher Löffelmann, Linus Hötzel, Utkarsha Shukla, Tobias Luckfiel, Heiko Schlarb. The development of the BioMAC-Sim-Toolbox was supported by adidas AG and by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) through Project-ID442419336, SFB 1483 - EmpkinS and through Project-ID520189992
 
 # TODOS
 - Check mu in 2D normal and 3D contact model
