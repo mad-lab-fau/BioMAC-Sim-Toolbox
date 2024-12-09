@@ -127,21 +127,8 @@ Currently, the toolbox can be used to solve trajectory optimization problems to 
 In future, the toolbox can be expanded. New problem classes can be defined, for example for inverse 
 kinematics and inverse dynamics, or to solve muscle activations and stimulations statically or dynamically. Furthermore, a single shooting approach can be implemented, which would allow for models with discontinuous dynamics or control to be investigated, such as a reflex model [@geyer:2010]. 
 
-# Figures
-
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
-
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
-
 # Acknowledgements
 
-We acknowledge contributions from Marko Ackermann, Dieter Heinrich, Maria Eleni Athanasiadou, Chuyi Wang, Christopher Löffelmann, Linus Hötzel, Utkarsha Shukla, Tobias Luckfiel, Heiko Schlarb. The development of the BioMAC-Sim-Toolbox was supported by adidas AG and by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) through Project-ID442419336, SFB 1483 - EmpkinS and through Project-ID520189992
-
-# TODOS
-- Check mu in 2D normal and 3D contact model
-- Ask Markus to add about the _osim model
+We acknowledge contributions from Marko Ackermann, Dieter Heinrich, Maria Eleni Athanasiadou, Chuyi Wang, Christopher Löffelmann, Linus Hötzel, Utkarsha Shukla, Arne Kuederle, Tobias Luckfiel, Heiko Schlarb. The development of the BioMAC-Sim-Toolbox was supported by adidas AG and by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) through Project-ID442419336, SFB 1483 - EmpkinS and through Project-ID520189992
 
 # References
