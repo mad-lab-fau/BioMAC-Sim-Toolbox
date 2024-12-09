@@ -54,14 +54,14 @@ forward shooting can be used to investigate neural control of gait.
 Movements of humans and other animals are extremely versatile, while our efficiency is unmatched by human-made 
 machines without having accurate or efficient controllers. Therefore, a better understanding of human movement can have a large impact for persons with movement disabilities, sports performance optimization, and design of human-made devices. Movement simulations are a key tool for creating this understanding.
 On the one hand, we can use so-called predictive simulations [@ackermann:2010; @falisse:2019;@koelewijn:2018] to investigate unseen movements by replicating the optimization in the central nervous system [@zarrugh:1974] in a computer optimization.
-On the other hand, we can use so-called reconstructive simulations to estimate variables that cannot or were not measured directly by minimizing a data tracking error [@dorschky:2019a;@nitschke:2023;@nitschke:2024]. Such wide-spread measurements and their biomechanical analysis are vital to be able to 
+On the other hand, we can use so-called reconstructive simulations to estimate variables that cannot or were not measured directly by minimizing a data tracking error [@dorscky:2019a;@nitschke:2023;@nitschke:2024]. Such wide-spread measurements and their biomechanical analysis are vital to be able to 
 reach this understanding of human movement.
 
 Here, we present `BioMAC-Sim-Toolbox`, a MATLAB toolbox that can be used to create simulations of human movement 
 and analyse human movements. The main functionality of the toolbox is that it solves trajectory optimization problems, or optimal control problems, for human musculoskeletal dynamics models. These dynamics models combine multibody 
 dynamics to model the movements of the skeleton with muscle dynamics models to model the dynamics of muscular 
 contraction and activation. In the trajectory optimization problem, the muscle stimulations are found that minimize an objective. This objective generally includes terms to minimize muscular effort and to minimize a tracking error
-with respect to measured movement data [@koelewijn:2016;@dorschky:2019a;@dorschky:2019b;@koelewijn:2022;@nitschke:2023;@nitschke:2024], but different other objectives have been implemented as well, such as 
+with respect to measured movement data [@koelewijn:2016;@dorscky:2019a;@dorschky:2019b;@koelewijn:2022;@nitschke:2023;@nitschke:2024], but different other objectives have been implemented as well, such as 
 minimization of metabolic energy expenditure [@koelewijn:2018]. The optimization problem can be described mathematically as follows:
 
 $$ \underset{\mathbf{x}(0),\mathbf{u}(t), v, T} {\text{minimize}} \quad J(\mathbf{x}, \mathbf{u}) =  \sum_{j=1}^{N_W} W_{j} \int_{t=0}^T c_{j}(x(t),u(t)) \mathrm{d} t + c_f(x(T),u(T)) $$
@@ -100,19 +100,19 @@ $$ \mathbf{x}(N+1) = \mathbf{x}(0) + v T \mathbf{x}_{hor} \quad \text{(periodici
 
 for $N$ collocation points $i$.
 
-Problems can be solved using the solvers that are implemented in the class "solver". So far, we have implemented IPOPT [@wachter:2006] to solve the resulting optimization problem. This algorithm can solve optimal control problems transcribed with direct collocation in less than 10 minutes for a 2D model [@koelewijn:2016; @koelewijn:2022] and less than one hour for a 3D model [@nitschke:2020]. Different solvers could easily be integrated into this solver class.
+Problems can be solved using the solvers that are implemented in the class "solver". So far, we have implemented IPOPT [@Wachter:2006] to solve the resulting optimization problem. This algorithm can solve optimal control problems transcribed with direct collocation in less than 10 minutes for a 2D model [@koelewijn:2016; @koelewijn:2022] and less than one hour for a 3D model [@nitschke:2020]. Different solvers could easily be integrated into this solver class.
 
 As most analysis is specific to the problem type, most code for analysis can be found in the respective problem class. For example, metabolic cost requires an integration over time, which is dependent on the problem type that is being used. In addition, general methods, e.g., to calculate a correlation or root mean squared error between two variables, or to write results into an OpenSim file format, can be found in the function "HelperFunctions folder". 
 
 We have implemented different human dynamics models. All implemented models are musculoskeletal models, but they can 
 also be used as skeletal models, such that the input is generated using joint moments instead of muscle stimulations. 
 We have implemented a 3D model version (gait3d) and two 2D model versions in c, which are compiled as mex functions. The model dynamics can be tested using the test cases coded in the "tests" folder. The 3D model and one 2D model (gait2d_osim) are loaded from OpenSim, but use our own muscle dynamics model, which is described in [@nitschke:2020],
-while the other (gait2dc) is used in our own previous work [@koelewijn:2016; @koelewijn:2022; @dorschky:2019a; @dorschky:2019b].
-The model parameters are defined in the .osim file for the OpenSim models, and defined in an Excel file for model gait2dc (gait2dc_par.xlsx). The models can be personalized by directly adjusting the parameters in the .osim model or Excel file, such that, for example, OpenSim scaling can be used [@seth:2011]. They can also still be adjusted in MATLAB, for example to investigate virtual participants [@dorschky:2019a][@koelewijn:2022]. The model dynamics are explained further for gait2dc [@koelewijn:2022; @dorschky:2019a; @dorschky:2019b], for gait3d [@nitschke:2020]. The gait2d_osim model has not yet been used in publications. It is based on the gait10dof18musc.osim model, and can be loaded in two ways: the original version, called gait10dof18musc, and a version with the lumbar joint locked, called gait2d_osim.
+while the other (gait2dc) is used in our own previous work [@koelewijn:2016; @koelewijn:2022; @dorscky:2019a; @dorschky:2019b].
+The model parameters are defined in the .osim file for the OpenSim models, and defined in an Excel file for model gait2dc (gait2dc_par.xlsx). The models can be personalized by directly adjusting the parameters in the .osim model or Excel file, such that, for example, OpenSim scaling can be used [@seth:2011]. They can also still be adjusted in MATLAB, for example to investigate virtual participants [@dorscky:2019a][@koelewijn:2022]. The model dynamics are explained further for gait2dc [@koelewijn:2022; @dorscky:2019a; @dorschky:2019b], for gait3d [@nitschke:2020]. The gait2d_osim model has not yet been used in publications. It is based on the gait10dof18musc.osim model, and can be loaded in two ways: the original version, called gait10dof18musc, and a version with the lumbar joint locked, called gait2d_osim.
 
 We have included several examples in the folder 'ExampleScripts' to highlight the applications of the model and help 
 future users get started with the code. We have added two introduction examples, one for 2D simulations (script2D.m) and one for 
-3D simulations (script3D), which is based on [@nitschke:2020]. The goal of these introductory examples is to show how the toolbox works, and
+3D simulations (script3D), which is based on @nitschke:2020. The goal of these introductory examples is to show how the toolbox works, and
 highlight different options in the implementation. We have added an application in the folder 'Treadmill' to show an example use
 of the 'gait2d_osim' model, combined with an implementation of a treadmill. Based on previous 
 publications, we have added three additional applications. The code in the folder 'IMU2D' shows how simulations can be 
