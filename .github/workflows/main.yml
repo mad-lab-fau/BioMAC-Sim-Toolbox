@@ -34,7 +34,7 @@ jobs:
       id: deployment
       uses: actions/upload-pages-artifact@v3 # or specific "vX.X.X" version tag for this action
       with:
-        path: ./docs/Doxygen/pages
+        path: ./docs/Doxygen/Doxygen_HTML
 
     # Deployment job
   deploy:
