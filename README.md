@@ -22,7 +22,7 @@ First, make sure that MatLab Compiler is installed. For **Windows**, mingw is ne
 
 **IPOPT**
 
-We recommend using the obtaining the following version through the Add-On Explorer in MATLAB: https://github.com/ebertolazzi/mexIPOPT. For Mac Users using Apple Silicon native MatLab versions, follow these instructions: https://github.com/ebertolazzi/mexIPOPT/issues/24
+We recommend using the following version which can be obtained through the Add-On Explorer in MATLAB: https://github.com/ebertolazzi/mexIPOPT. For Mac Users using Apple Silicon native MatLab versions, follow these instructions: https://github.com/ebertolazzi/mexIPOPT/issues/24
 
 **OpenSim** (optional)
 
@@ -107,4 +107,4 @@ To run any of the introduction scripts, make sure that the folder "ExampleScript
 
 ## Citation
 
-If you are using our toolbox in your research, we would be glad for a citation. Our _paper_ is still under review, we will update the citation. Follow us on ... for updates.
+If you are using our toolbox in your research, we would be glad for a citation. Our _paper_ is still under review, we will update the citation as soon as it is available. Follow Anne Koelewijn on BlueSky or LinkedIn for updates.
