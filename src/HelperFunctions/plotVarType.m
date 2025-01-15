@@ -103,7 +103,7 @@ function [hFig, style] = plotVarType(varTable, style, standing_r, standing_l)
     if ~isfield(style.subFigSettings, 'originRight'); style.subFigSettings.originRight = 2; end
     if ~isfield(style.subFigSettings, 'oneUp'); style.subFigSettings.oneUp = 1.5; end
     if ~isfield(style.subFigSettings, 'oneRight'); style.subFigSettings.oneRight = 2.5; end
-    if ~isfield(style.subFigSettings, 'nCol'); style.subFigSettings.nCol = 2; end
+    if ~isfield(style.subFigSettings, 'nCol'); style.subFigSettings.nCol = 5; end
 
     % Get stuff from style struct
     figureSize         = style.figureSize;
