@@ -31,7 +31,7 @@ authors:
 affiliations:
  - name: Friedrich-Alexander-Universität Erlangen-Nürnberg, Erlangen, Germany
    index: 1
- - name: Cleveland State University, Cleveland, Ohio, USA
+ - name: Cleveland State University, Cleveland, Ohio, United States of America
    index: 2
 date: 13 August 2024
 bibliography: paper.bib
