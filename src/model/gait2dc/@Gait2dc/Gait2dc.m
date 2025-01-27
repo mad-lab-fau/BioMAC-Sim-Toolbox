@@ -53,8 +53,6 @@ classdef Gait2dc < Model
         lambda = [0.01 0.1]
         %> Double: Slope of ground in deg (positive is uphill)
         slope
-        %> Double matrix: Strain engergy terms to model apparel (20 x 7)
-        strainEnergyTerms
     end
     
     properties(Dependent, SetAccess = protected, SetObservable, AbortSet)
@@ -130,7 +128,6 @@ classdef Gait2dc < Model
             addlistener(obj,'joints'           ,'PostSet',@obj.update_mexParameter);
             addlistener(obj,'muscles'          ,'PostSet',@obj.update_mexParameter);
             addlistener(obj,'CPs'              ,'PostSet',@obj.update_mexParameter);
-            addlistener(obj,'strainEnergyTerms','PostSet',@obj.update_mexParameter);
             addlistener(obj,'bodyheight'       ,'PostSet',@obj.update_mexParameter);
             addlistener(obj,'bodymass'         ,'PostSet',@obj.update_mexParameter);
             addlistener(obj,'dofs'             ,'PostSet',@obj.update_mexParameter);
@@ -1115,7 +1112,7 @@ classdef Gait2dc < Model
         %> @details
         %> - Called with a PostSet event after set lambda, bodyheight, bodymass, 
         %>   gravity, drag_coefficient, wind_speed, slope, joints, muscles, CPs, 
-        %>   strainEnergyTerms, dofs, segments.
+        %>   dofs, segments.
         %> - Reinitializes mex with new parameter matrixs.
         %> - This function calls all the other update functions. If we
         %>   would also add a listener for them, we could not ensure that they
@@ -1193,8 +1190,6 @@ classdef Gait2dc < Model
                             parameter_tmp(idx, 8) = obj.CPs{iRow, 'c'};
                             parameter_tmp(idx, 9) = obj.CPs{iRow, 'b'};
                         end
-                    case 'strainEnergyTerms'
-                        parameter_tmp((1:20)+obj.idxParamSections(5)+1, 2:8) = obj.strainEnergyTerms;
                     case 'dofs'
                         obj.hnDofs = height(obj.dofs); % Has to be updated before the states
                         for iRow = 4 : obj.nDofs % range of first 3 dofs is not defined in excel file

@@ -18,27 +18,26 @@
 %> @endcode
 %>
 %> Overview:
-%> | Testname/Tag                    | Apparel | Derivative | Freefall | Isometric | Memory | Speed | Neutral | getDynamics | getGRF | getJointmoments | simuAccGyro | showStick |
-%> |---------------------------------|---------|------------|----------|-----------|--------|-------|---------|-------------|--------|-----------------|-------------|-----------|
-%> | derivativetest_Dynamics         |         | x          |          |           |        |       |         | x           |        |                 |             |           |
-%> | derivativetest_SimuAccGyro_Acc  |         | x          |          |           |        |       |         |             |        |                 | x           |           |
-%> | derivativetest_SimuAccGyro_Gyro |         | x          |          |           |        |       |         |             |        |                 | x           |           |
-%> | derivativetest_Moments          |         | x          |          |           |        |       |         |             |        | x               |             |           |
-%> | derivativetest_GRF              |         | x          |          |           |        |       |         |             | x      |                 |             |           |
-%> | test_simulateFreefall           |         |            | x        |           |        |       |         | x           |        |                 |             |           |
-%> | test_showStickNeutral           |         |            |          |           |        |       | x       |             |        |                 |             | x         |
-%> | test_dynamics                   |         |            |          |           |        |       |         | x           | x      | x               |             |           |
-%> | test_memory                     |         |            |          |           | x      |       |         | x           |        |                 |             |           |
-%> | test_speedOfSimuAccGyro         |         |            |          |           |        | x     |         |             |        |                 | x           |           |
-%> | test_speedOfMex                 |         |            |          |           |        | x     |         | x           |        |                 |             |           |
-%> | test_s_hip_flexion_gyro         |         |            |          |           |        |       |         |             |        |                 | x           |           |
-%> | test_s_static_upright_acc       |         |            |          |           |        |       | x       |             |        |                 | x           |           |
-%> | test_s_static_upright_gyro      |         |            |          |           |        |       | x       |             |        |                 | x           |           |
-%> | test_dynamicGRF                 |         |            |          |           |        |       |         |             | x      |                 |             |           |
-%> | test_isokineticMuscles          |         |            |          |           |        |       | x       | x           |        | x               |             |           |
-%> | test_isometricMuscles           |         |            |          | x         |        |       |         | x           |        | x               |             |           |
-%> | test_apparel                    | x       |            |          |           |        |       |         | x           |        | x               |             |           |
-%> | test_grf                        |         |            |          |           |        |       |         |             | x      |                 |             |           |
+%> | Testname/Tag                    | Derivative | Freefall | Isometric | Memory | Speed | Neutral | getDynamics | getGRF | getJointmoments | simuAccGyro | showStick |
+%> |---------------------------------|------------|----------|-----------|--------|-------|---------|-------------|--------|-----------------|-------------|-----------|
+%> | derivativetest_Dynamics         | x          |          |           |        |       |         | x           |        |                 |             |           |
+%> | derivativetest_SimuAccGyro_Acc  | x          |          |           |        |       |         |             |        |                 | x           |           |
+%> | derivativetest_SimuAccGyro_Gyro | x          |          |           |        |       |         |             |        |                 | x           |           |
+%> | derivativetest_Moments          | x          |          |           |        |       |         |             |        | x               |             |           |
+%> | derivativetest_GRF              | x          |          |           |        |       |         |             | x      |                 |             |           |
+%> | test_simulateFreefall           |            | x        |           |        |       |         | x           |        |                 |             |           |
+%> | test_showStickNeutral           |            |          |           |        |       | x       |             |        |                 |             | x         |
+%> | test_dynamics                   |            |          |           |        |       |         | x           | x      | x               |             |           |
+%> | test_memory                     |            |          |           | x      |       |         | x           |        |                 |             |           |
+%> | test_speedOfSimuAccGyro         |            |          |           |        | x     |         |             |        |                 | x           |           |
+%> | test_speedOfMex                 |            |          |           |        | x     |         | x           |        |                 |             |           |
+%> | test_s_hip_flexion_gyro         |            |          |           |        |       |         |             |        |                 | x           |           |
+%> | test_s_static_upright_acc       |            |          |           |        |       | x       |             |        |                 | x           |           |
+%> | test_s_static_upright_gyro      |            |          |           |        |       | x       |             |        |                 | x           |           |
+%> | test_dynamicGRF                 |            |          |           |        |       |         |             | x      |                 |             |           |
+%> | test_isokineticMuscles          |            |          |           |        |       | x       | x           |        | x               |             |           |
+%> | test_isometricMuscles           |            |          | x         |        |       |         | x           |        | x               |             |           |
+%> | test_grf                        |            |          |           |        |       |         |             | x      |                 |             |           |
 %>
 %======================================================================
 classdef Gait2dcTest < ModelTest
@@ -112,55 +111,6 @@ classdef Gait2dcTest < ModelTest
             xlabel('horizontal speed (m/s)');
             ylabel('right Fx (BW)');
             title('Horizontal slip test');
-            
-        end
-        
-    end
-    
-    methods (Test, TestTags = {'Apparel','getDynamics', 'getJointmoments'})
-        %=================================================================
-        %> @brief Function for testing the model using apparel
-        %>
-        %> @details
-        %> Tests additional joint moments to model apparel.
-        %> (See "2D Model with Contact (gait2dc) Reference Manual for Version 1.0")
-        %>
-        %> @image html Gait2dcTest_test_apparel.png width=800px
-        %>
-        %> @todo 
-        %> Add error checking
-        %=================================================================
-        function test_apparel(testCase)
-            % setup the Model object
-            iCom = 0; % no data
-            testCase = testCase.setup_Test_Random(iCom);
-            
-            % add apparel model to the parameters matrix
-            k = 10000;					% stiffness of structure (N/m)
-            L0 = -0.10;					% elongation of the structure at full extension
-            dH = -0.15;					% moment arm at hip (m), negative because structure is posterior to hip
-            dK = 0.10;					% moment arm at knee (m), positive because structure is anterior to knee
-            polynomial = [ ...
-                -k * dH * L0		1	0	0	0	0	0; ...
-                -k * dK * L0		0	1	0	0	0	0; ...
-                0.5 * k * dH^2		2	0	0	0	0	0; ...
-                0.5 * k * dK^2		0	2	0	0	0	0; ...
-                k * dH*dK			1	1	0	0	0	0; ...
-                -k * dH * L0		0	0	0	1	0	0; ...
-                -k * dK * L0		0	0	0	0	1	0; ...
-                0.5 * k * dH^2		0	0	0	2	0	0; ...
-                0.5 * k * dK^2		0	0	0	0	2	0; ...
-                k * dH*dK			0	0	0	1	1	0; ...
-                ];
-            polynomial = [polynomial;polynomial]; % Copy for other foot
-            evalc('testCase.model.strainEnergyTerms = polynomial;');
-            
-            figure('Name', 'test_apparel');
-            set(gcf,'units','normalized','outerposition',[0 0 1 1]);pause(0.1);
-            % hip moment-angle curves, at 30-deg intervals in knee angle
-            testCase.isometric_curves(1,-30:5:90,2,-120:30:0);
-            % knee moment-angle curves, at 30-deg intervals in hip angle
-            testCase.isometric_curves(2,-120:5:0,1,-30:30:90);
             
         end
         
@@ -761,7 +711,7 @@ classdef Gait2dcTest < ModelTest
         
         
         %======================================================================
-        %> @brief Function to simulate maximum moment for test_apparel()
+        %> @brief Function to simulate maximum moment
         %>
         %> @details
         %> Simulates maximum moment at one joint, as function of all joint angles and angular velocities.
@@ -821,7 +771,7 @@ classdef Gait2dcTest < ModelTest
               
             
             %======================================================================
-            %> @brief Function to get contraction equilibrium for test_apparel()
+            %> @brief Function to get contraction equilibrium
             %>
             %> @param Lce
             %> @retval F

@@ -32,8 +32,8 @@ path2repo = [filePath filesep '..' filesep '..' filesep];
 
 % Fixed settings    
 dataFolder           = 'data\IMU2D';                      % Relative from the path of the repository
-dataFileWalking      = 'P01_normwalking.mat';                 % Data from Winter's book (2009)
-dataFileRunning      = 'P01_normrunning.mat';                 % Data from Winter's book (2009)
+dataFileWalking      = 'P01_normwalking.mat';                 % Walking data at normal speed from Dorschky et al. (2019)
+dataFileRunning      = 'P01_normrunning.mat';                 % Running data at normal speed from Dorschky et al. (2019)
 modelFile            = 'gait2dc_par.xls';                   % Name of our default 2D model settings 
 resultFolder         = 'results\IMUTracking2D\';            % Relative from the path of the repository
 

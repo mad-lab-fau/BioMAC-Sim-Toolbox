@@ -330,12 +330,5 @@ dofs.name = [];
 % Set object
 obj.dofs = dofs;
 
-
-
-% Set strainEnergyTerms:
-obj.strainEnergyTerms = obj.parameter((1:20)+idxParamSections(5)+1, 2:8);
-
-
-
 end
 
