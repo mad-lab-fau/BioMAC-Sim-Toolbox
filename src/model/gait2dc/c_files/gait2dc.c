@@ -30,7 +30,6 @@
 // size of the model (some other size constants are in gait2dc.h)
 #define NMUS 16						// number of muscles 
 #define MAXCONTACTS 20				// maximum number of contact points in the model
-#define MAXPOLTERMS 20				// maximum number of terms in the strain energy polynomial
 #define MAXSTATES 2*NDOF+2*NMUS+4*MAXCONTACTS		// max number of system state variables, including contact variables
 
 // M_PI is known in gcc but not in Visual C++ 2008
@@ -73,15 +72,12 @@ typedef struct {
 static int initialized = 0;
 static mwSize nstates = 0;						// number of state variables
 static int ncontacts = 0;					// number of contact points
-static int nstrainterms;						// number of terms in the strain energy polynomial
 static double zeros[MAXSTATES];				// contains zeros always
 static muscleprop muscles[NMUS];			// contains all muscle properties
 static contactprop contacts[MAXCONTACTS];	// contains all contact properties
 static param_struct param;					// contains other model parameters
 static int nonzeromomentarms;				// number of nonzero moment arms (nonzeros in dL/dq), for memory allocation
 static double bodymass;						// total body mass
-static double straincoeff[MAXPOLTERMS];						// coefficients of strain energy polynomial
-static int strainexpon[MAXPOLTERMS][NMOM];					// exponents of strain energy polynomial
 
 // ===================================================================================
 // ExtractParameters: extract model parameters from the parameter matrix
@@ -177,22 +173,6 @@ void ExtractParameters(double par[]) {
 		param.JointB[i]		= par[s+4*nrows];
 		param.JointK1[i]		= par[s+5*nrows];
 		param.JointPhi0[i]	= par[s+6*nrows];
-	}
-	
-	// Read strain energy polynomial
-	nstrainterms = 0;
-	s = sectionrows[5] + 2 + nrows;
-	while ( (nstrainterms < MAXPOLTERMS) && !isnan(par[s]) ){
-		straincoeff[nstrainterms]	= par[s];
-		for (i=0; i<NMOM; i++) {
-			double exponent = par[s + (i+1)*nrows];
-			if (floor(exponent+0.5) != exponent) {
-				mexErrMsgTxt("Non-integer exponent was used in strain energy polynomial.");
-			}
-			strainexpon[nstrainterms][i] = (int) floor(exponent+0.5);
-		}
-		nstrainterms++;
-		s++;
 	}	
 	
 #if VERBOSE
@@ -451,8 +431,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	double *par, ang, angvel, dmax, dmin, ddmax, ddmin;
 	double massfactor, lengthfactor, inertiafactor;
 	int derivatives;
-	double strainenergy;
-	double polgrad[NMOM], polhess[NMOM][NMOM];	// gradient and hessian of strain energy polynomial
 	
 	
 	// muscle variables
@@ -1363,58 +1341,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 			&CEpower[i]);				
 	}
 
-	// Evaluate the strain energy polynomial, with gradient and hessian
-	strainenergy = 0.0;
-	for (i=0; i<NMOM; i++) {
-		polgrad[i] = 0.0;
-		for (j=0; j<NMOM; j++) {
-			polhess[i][j] = 0.0;
-		}
-	}
-    for (i=0; i < nstrainterms; i++) {
-		double term, dterm;
-	
-		// calculate this term's contribution to the strain energy
-		term = straincoeff[i];
-		if (term != 0.0) {
-			for (j=0; j < NMOM; j++) {
-				for (k=0; k < strainexpon[i][j]; k++) {
-					term = term * x[3+j];			// this creates coeff[i] * product of exponentiated angles
-				}
-			}
-			strainenergy = strainenergy + term;
-
-			// contribution of this term to the gradient and hessian of E with respect to joint angles
-			for (k=0; k < NMOM; k++) {
-				// derivative of this term with respect to angle k is nonzero when exponent of angle k is not zero
-				// this goes wrong when angle is exactly zero, but that never really happens
-				if (strainexpon[i][k] > 0) {
-					if (x[3+k] == 0.0) {
-						mexErrMsgTxt("Elastic strain effects cannot be calculated when a joint angle is exactly zero.");		
-					}
-					dterm = strainexpon[i][k] * term / x[3+k];
-					polgrad[k] = polgrad[k] + dterm;
-				
-					// off-diagonal hessian elements
-					for (kk=0; kk < k; kk++) {					// no need for kk > k because the hessian is symmetrical
-						if (strainexpon[i][kk] > 0) {
-							if (x[3+kk] == 0.0) {
-								mexErrMsgTxt("Elastic strain effects cannot be calculated when a joint angle is exactly zero.");		
-							}
-							polhess[k][kk] = polhess[k][kk] + strainexpon[i][kk] * dterm / x[3+kk];
-							polhess[kk][k] = polhess[k][kk];		// symmetry
-						}
-					}
-					
-					// diaginal hessian elements
-					if (strainexpon[i][k] > 1) {
-						polhess[k][k] = polhess[k][k] + (strainexpon[i][k]-1) * dterm / x[3+k];
-					}
-				}
-			}
-		}
-    }
-	
 	// Compute the joint moments
 	for (i=0; i<NMOM; i++) {
 		// initialize derivatives to zero
@@ -1437,14 +1363,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		if (derivatives) {
 			dmom_dang[i][i] = -param.JointK1[i] - param.JointK2[i] * (ddmax + ddmin);
 			dmom_dangvel[i] = -param.JointB[i];
-		}
-		
-		// add the moment at joint i due to the strain energy polynomial
-		mom[i] = mom[i] - polgrad[i];		// moment is minus the gradient of the strain energy function
-		if (derivatives) {
-			for (j=0; j<NMOM; j++) {
-				dmom_dang[i][j] = dmom_dang[i][j] - polhess[i][j];		// derivatives from hessian of strain energy function	
-			}
 		}
 		
 		// add the muscle moments
