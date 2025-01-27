@@ -18,7 +18,7 @@ P_#2#_Pacc#1#>  := Xaccpos#1# * #1#1> + Yaccpos#1# * #1#2>;
 A2PTS(Ground, #1#, #2#, Pacc#1#);
 
 % add the gravity term to the acceleration
-A_Pacc#1#_Ground> += gravity*Ground2>;
+A_Pacc#1#_Ground> += par__gravity*Ground2>;
 
 % decompose acceleration along axes of segment reference frame
 Variables sx#1#,Sx#2#

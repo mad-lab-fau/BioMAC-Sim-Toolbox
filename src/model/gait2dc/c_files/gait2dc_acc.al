@@ -15,7 +15,10 @@
 % Author: Ton van den Bogert
 % Last revised: 03/24/2011
 
-RUN gait2d_kin.al
+RUN gait2dc_kin.al
+
+% gravity is needed in the accelerometer model
+Constants par__gravity					% Local gravitational acceleration value
 
 %--------------------------------------------------------------------------
 % Create the accelerometer models for each segment, using the
@@ -40,6 +43,6 @@ dacc_dqdd = D(acc,qdd);
 encode acc, dacc_dq, dacc_dqd, dacc_dqdd
 
 % Generate C code
-Code Algebraic() gait2d_acc_raw.c
+Code Algebraic() gait2dc_acc_al_raw.c
 
 EXIT

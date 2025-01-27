@@ -1052,7 +1052,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		qdd = mxGetPr(prhs[3]);
 		
 		// call the Autolev C code
-		acc_al(&param, q, qd, qdd, acc, dacc_dq, dacc_dqd, dacc_dqdd);
+		acc_al(&param, q, qd, qdd, acc, dacc_dq, dacc_dqd, dacc_dqdd);  
 
 		// Create the return argument fa
 		if (nlhs < 1) mexErrMsgTxt("gait2d: Accelerometer command needs at least one output.");
