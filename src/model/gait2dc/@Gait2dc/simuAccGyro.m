@@ -55,7 +55,7 @@ if any(idxSegment==0)
     error('The following segments are not defined in the model: %s',  sprintf('%s ', nonExistingSegments{:}));
 end
 
-% Get indices of acc and gyro in variables tabale
+% Get indices of acc and gyro in variables table
 if nargin < 7
     idxAcc = find(ismember(variables.type, 'acc'))';
 end
@@ -66,7 +66,6 @@ nAcc = numel(idxAcc); %number of accelerometer variables
 nGyro = numel(idxGyro); %number of gyroscope variables
 nVars = length(idxSegment); % much faster then size(variables, 1) or height(variables)
 
-
 % Initialize the outputs
 s = zeros(nVars, 1);
 if (nargout > 1)
@@ -76,53 +75,22 @@ if (nargout > 1)
 end
 
 %% Accelerometer
-% determine further values for Accelerometer tracking
+% If we have accelerometers, determine the 42 accelerometer model coefficients
+% (7 segments x 6 model terms), and their Jacobians
+% An accelerometer placed at local coordinates (xpos,ypos) on a body segment
+% produces these signals (in local reference frame):
+% Sx = a1 + a2*xpos + a3*ypos
+% Sy = a4 + a5*xpos + a6*ypos
+% xpos,ypos are measured relative to the proximal joint.
 if nAcc > 0
-    hh = 1e-7;
-    % determine the 42 accelerometer model coefficients (7 segments x 6 model terms), and their Jacobians
-    if (0)
-        if nargout > 1
-            [a, da_dq, da_dqd, da_dqdd] = gait2dc('Accelerometer',q,qd,qdd);
-        else
-            a = gait2dc('Accelerometer',q,qd,qdd);
-        end
+    if nargout > 1
+        [a, da_dq, da_dqd, da_dqdd] = gait2dc('Accelerometer',q,qd,qdd);
     else
         a = gait2dc('Accelerometer',q,qd,qdd);
-        
-        if nargout > 1
-            % The three Jacobians of a are calculated here by finite differences, because we have a crash if we
-            % get them from gait2dc.mexw32.  This needs to be looked
-            % at! --> No crash at the moment
-            da_dq = zeros(42,obj.nDofs);
-            da_dqd = zeros(42,obj.nDofs);
-            da_dqdd = zeros(42,obj.nDofs);
-            
-            for k = 1:obj.nDofs
-                tt = q(k);
-                q(k) = q(k) + hh;
-                da_dq(:,k) = (gait2dc('Accelerometer',q,qd,qdd) - a) / hh;
-                q(k) = tt;
-                
-                tt = qd(k);
-                qd(k) = qd(k) + hh;
-                da_dqd(:,k) = (gait2dc('Accelerometer',q,qd,qdd) - a) / hh;
-                qd(k) = tt;
-                
-                tt = qdd(k);
-                qdd(k) = qdd(k) + hh;
-                da_dqdd(:,k) = (gait2dc('Accelerometer',q,qd,qdd) - a) / hh;
-                qdd(k) = tt;
-            end
-            da_dq = sparse(da_dq);
-            da_dqd = sparse(da_dqd);
-            da_dqdd = sparse(da_dqdd);
-        end
-    end
-    
+    end   
 end
 
-
-% simulate accelerometer signal
+% simulate accelerometer signals
 if ~isempty(idxAcc)
     for iVar = idxAcc
         
@@ -137,7 +105,7 @@ if ~isempty(idxAcc)
         % accelerometer signal s
         value = a(ia);
         s(iVar) = c*value;
-        % Jacobians ds/dq, ds/dqd and ds/dh
+        % Jacobians ds/dq, ds/dqd and ds/dqdd
         if nargout > 1
             ds_dq(iVar, :)  = c*da_dq(ia,:);      % because ds_dq = c*da_dq(ia,:);
             ds_dqd(iVar, :) = c*da_dqd(ia,:);     % because ds_dqd = c*da_dqd(ia,:);
