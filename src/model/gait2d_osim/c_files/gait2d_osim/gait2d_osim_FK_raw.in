@@ -1,0 +1,53 @@
+File: gait2d_osim/gait2d_osim_FK_raw.in
+-----------------------------------------------------------------------------
+Note: Use spaces not tabs while editing this file.
+----------------------------------------------------------+------------------
+Description          Quantity             Units           | Value
+----------------------------------------------------------|------------------
+Constant             par__back_x          UNITS           |  0.0
+Constant             par__back_y          UNITS           |  0.0
+Constant             par__Lankle_y        UNITS           |  0.0
+Constant             par__Lhip_x          UNITS           |  0.0
+Constant             par__Lhip_y          UNITS           |  0.0
+Constant             par__Lknee_x1        UNITS           |  0.0
+Constant             par__Lknee_x2        UNITS           |  0.0
+Constant             par__Lknee_x3        UNITS           |  0.0
+Constant             par__Lknee_x4        UNITS           |  0.0
+Constant             par__Lknee_x5        UNITS           |  0.0
+Constant             par__Lknee_y1        UNITS           |  0.0
+Constant             par__Lknee_y2        UNITS           |  0.0
+Constant             par__Lknee_y3        UNITS           |  0.0
+Constant             par__Lknee_y4        UNITS           |  0.0
+Constant             par__Lknee_y5        UNITS           |  0.0
+Constant             par__Rankle_y        UNITS           |  0.0
+Constant             par__Rhip_x          UNITS           |  0.0
+Constant             par__Rhip_y          UNITS           |  0.0
+Constant             par__Rknee_x1        UNITS           |  0.0
+Constant             par__Rknee_x2        UNITS           |  0.0
+Constant             par__Rknee_x3        UNITS           |  0.0
+Constant             par__Rknee_x4        UNITS           |  0.0
+Constant             par__Rknee_x5        UNITS           |  0.0
+Constant             par__Rknee_y1        UNITS           |  0.0
+Constant             par__Rknee_y2        UNITS           |  0.0
+Constant             par__Rknee_y3        UNITS           |  0.0
+Constant             par__Rknee_y4        UNITS           |  0.0
+Constant             par__Rknee_y5        UNITS           |  0.0
+Constant             q1                   UNITS           |  0.0
+Constant             q2                   UNITS           |  0.0
+Constant             q3                   UNITS           |  0.0
+Constant             q4                   UNITS           |  0.0
+Constant             q5                   UNITS           |  0.0
+Constant             q6                   UNITS           |  0.0
+Constant             q7                   UNITS           |  0.0
+Constant             q8                   UNITS           |  0.0
+Constant             q9                   UNITS           |  0.0
+Constant             q1'                  UNITS           |  0.0
+Constant             q2'                  UNITS           |  0.0
+Constant             q3'                  UNITS           |  0.0
+Constant             q4'                  UNITS           |  0.0
+Constant             q5'                  UNITS           |  0.0
+Constant             q6'                  UNITS           |  0.0
+Constant             q7'                  UNITS           |  0.0
+Constant             q8'                  UNITS           |  0.0
+Constant             q9'                  UNITS           |  0.0
+----------------------------------------------------------+------------------
