@@ -30,6 +30,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           folder: ./docs/Doxygen/html
           config_file: ./docs/Doxygen/Doxyfile
+          branch: main
     
     - name: Upload static files as artifact
       id: deployment
