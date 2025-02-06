@@ -33,7 +33,7 @@ jobs:
       shell: bash
 
     - name: Generate Doxygen Documentation
-      run: ./docx/Doxygen/build_docs.sh
+      run: ./docs/Doxygen/build_docs.sh
       shell: bash
           
     #- name: Doxygen Action
