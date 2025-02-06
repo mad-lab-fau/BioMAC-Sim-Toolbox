@@ -23,13 +23,24 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-        
-    - name: Doxygen Action
-      uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
+
+      
+    - name: Action Doxygen and GitHub Pages
+      id: ghaction
+      uses: AgarwalSaurav/ghaction-doxygen-ghpages@release/v2
       with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          folder: ./docs/Doxygen/html
-          config_file: ./docs/Doxygen/Doxyfile
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: .
+        doxyfile-path: ./docs/Doxygen/Doxyfile
+        html-output-folder: ./docs/Doxygen/html
+        branch: gh-pages
+          
+    #- name: Doxygen Action
+    #  uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
+    #  with:
+    #      github_token: ${{ secrets.GITHUB_TOKEN }}
+    #      folder: ./docs/Doxygen/html
+    #      config_file: ./docs/Doxygen/Doxyfile
     
     - name: Upload static files as artifact
       id: deployment
