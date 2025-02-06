@@ -768,7 +768,7 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ../../src \
+INPUT                  = ./src \
                          ../../ExampleScripts \
                          pages/mainpage.dox
 
