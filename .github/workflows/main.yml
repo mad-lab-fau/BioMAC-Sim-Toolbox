@@ -7,9 +7,7 @@ name: Doxygen Action
 on:
   push:
     branches: [ main ]
-
-
-  
+ 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -17,23 +15,26 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    permissions: 
-      contents: write
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-
       
-    - name: Action Doxygen and GitHub Pages
-      id: ghaction
-      uses: AgarwalSaurav/ghaction-doxygen-ghpages@release/v2
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        working-directory: .
-        doxyfile-path: ./docs/Doxygen/Doxyfile
-        html-output-folder: ./docs/Doxygen/html
-        branch: gh-pages
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y wget graphviz
+      shell: bash
+
+    - name: Install Doxygen v1.9.6
+      run: |
+        transformed_version=1_9_6
+        wget https://github.com/doxygen/doxygen/releases/download/Release_${transformed_version}/doxygen-1.9.6.linux.bin.tar.gz
+        tar -xzf doxygen-1.9.6.linux.bin.tar.gz
+        sudo mv doxygen-1.9.6/bin/doxygen /usr/local/bin/doxygen
+      shell: bash
+
+    - name: Generate Doxygen Documentation
+      run: ./docx/Doxygen/build_docs.sh
+      shell: bash
           
     #- name: Doxygen Action
     #  uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
