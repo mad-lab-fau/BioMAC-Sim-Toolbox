@@ -6,7 +6,6 @@
  * @author Antonie J. (Ton) van den Bogert, Iris Kellermann, Eva Dorschky
  * @date Mai 31, 2016
  *
- *
  * @copyright 2009-2012 Orchard Kinetics LLC
  *
  * @details Implicit differential equation for 2D musculoskeletal model : f(x,dx/dt,u) = 0
@@ -586,11 +585,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		if (!mxIsDouble(prhs[1]) || mxIsComplex(prhs[1]) )
 			mexErrMsgTxt("gait2dc: Incorrect type for par, must be double.");
 		par = mxGetPr(prhs[1]);
-		printf("***************************************************\n");
-		printf("*              MEX Function gait2dc                  *\n");  
-		printf("*       (c) 2011-2012 Orchard Kinetics LLC        *\n");
-		printf("***************************************************\n");
-		printf("Initializing model...\n");
+		printf("Initializing MEX function gait2dc...\n");
 		ExtractParameters(par);
 		initialized = 1959;
 		nstates = 2*NDOF + 2*NMUS + 4*ncontacts;	
