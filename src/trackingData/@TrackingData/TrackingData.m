@@ -54,6 +54,8 @@ classdef TrackingData < handle & matlab.mixin.Copyable
         participantAge
         %> String: Gender of participant ('female' or 'male')
         participantGender
+        %> String: Experiment ID of participant
+        participantID
         %> Cell array of strings: Description of the single data trials (nTrials x 1)
         trialList
         %> String: Movement type which was recorded (e.g. walking)
