@@ -62,6 +62,15 @@ end
 if nargin < 8
     idxGyro = find(ismember(variables.type, 'gyro'))';
 end
+
+% Get direction of position of accs and gyros
+if nargin < 9
+    dlocalAll = variables.direction;
+end
+if nargin < 10
+    plocalAll = variables.position;
+end
+
 nAcc = numel(idxAcc); %number of accelerometer variables
 nGyro = numel(idxGyro); %number of gyroscope variables
 nVars = length(idxSegment); % much faster then size(variables, 1) or height(variables)

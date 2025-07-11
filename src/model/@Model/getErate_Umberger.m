@@ -72,7 +72,7 @@ v_cemaxst = v_cemaxft/2.5;
 
 % Nominal value
 Nh_am = 25.*(act<=(1-FT))+(128*FT+25).*(act>(1-FT));
-A_am = A.^0.6; % Activation and maintenance
+A_am = real(A.^0.6); % Activation and maintenance. Using real() to avoid complex numbers if A is numerically negative (e.g., -1e-10).
 h_am = (Nh_am.*A_am*S).*(l_ce <= 1) + ((0.4*Nh_am + 0.6*Nh_am.*F_iso).*A_am*S).*(l_ce > 1);
 
 % Shortening-Lengthening energy
