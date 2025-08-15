@@ -25,10 +25,7 @@ end
 %% compute demanded output
 % forward translation in x direction
 speed = X(obj.idx.speed);
-% if  isa(targetSpeed, 'TrackingData')
-%     idxVars = find(ismember(targetSpeed.variables.type, 'speed')); %indices of tracking variables
-%     targetSpeed = targetSpeed.variables.mean{idxVars};
-% end
+
 if strcmp(option,'confun') %constraints of periodicity constraint
     output =  speed - targetSpeed;   
 elseif strcmp(option,'jacobian') %jacobian of periodicity constraint
