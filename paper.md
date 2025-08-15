@@ -121,18 +121,18 @@ tested using the test cases coded in the 'tests' folder. The 3D model and one 2D
 muscle dynamics model, which is described in [@nitschke:2020], while the other (gait2dc) is used in our own previous work 
 [@koelewijn:2016; @koelewijn:2022; @dorscky:2019a; @dorschky:2019b]. The model parameters are defined in the .osim file for the OpenSim models, 
 and defined in an Excel file for model gait2dc (gait2dc_par.xlsx). The models can be personalized by directly adjusting the parameters in the 
-.osim model or Excel file, such that, for example, OpenSim scaling can be used [@seth:2011]. They can also still be adjusted in MATLAB, for 
+.osim model or Excel file, such that, for example, OpenSim scaling can be used [@seth:2018]. They can also still be adjusted in MATLAB, for 
 example to investigate virtual participants [@dorscky:2019a; @koelewijn:2022]. The model dynamics are explained further for gait2dc 
-[@koelewijn:2022; @dorscky:2019a; @dorschky:2019b], for gait3d [@nitschke:2020]. The gait2d_osim model has not yet been used in publications. 
+[@koelewijn:2022; @dorscky:2019a; @dorschky:2019b], for gait3d [@nitschke:2020]. The gait2d_osim model has been used in [@gambietz:2024]. 
 It is based on the gait10dof18musc.osim model, and can be loaded in two ways: the original version, called gait10dof18musc, and a version with 
 the lumbar joint locked, called gait2d_osim.
 
 | Model Name      | Dimensionality | Degrees of freedom | Number of muscles | Arm torque actuators | Source | 
 | --------------- | -------------  | ------------------ | ----------------  | -------------------- | ------ | 
 | gait2dc         |      2D        |          9         |         16        |    -                 |[@koelewijn:2016; @koelewijn:2022; @dorscky:2019a; @dorschky:2019b] |
-| gait2d_osim     |      2D        |                    |                   |    -                 |
-| gait10dof18musc |      2D        |                    |                   |    -                 |
-| gait3d          |      3D        |          33        |         92        |       10             |[@nitscke:2020; @nitscke:2023; @nitschke:2024] |
+| gait2d_osim     |      2D        |          9         |         18        |    -                 |[@seth:2018]
+| gait10dof18musc |      2D        |          10        |         18        |    -                 |[@seth:2018]
+| gait3d          |      3D        |          33        |         92        |       10             |[@nitschke:2020; @nitschke:2023; @nitschke:2024] |
 **Table 1:** Overview of dynamics models implemented in the BioMAC-Sim-Toolbox
 
 **To get started, we recommend that users first look at the tutorial in the folder 'Tutorial' and the folder 'IntroductionExamples' in 
