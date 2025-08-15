@@ -122,9 +122,7 @@ sr_norm = 60/(resultWalking.X(idur)*2);
 % Now create simulations between 85% and 115% of the optimal step rate. We
 % define the vector as follows to be able to use the previous % as initial
 % guess for the new simulation (e.g. 99% to create 98%)
-steprates_rel = [1.0 0.9 0.8 1.0 1.1 1.2];%[1.0:-0.01:0.85 1.0:0.01:1.15];
-steprates_min = 0.85*sr_norm;
-steprates_max = 1.15*sr_norm;
+steprates_rel = [1.0 0.95 0.9 0.85 1.0 1.05 1.1 1.15];%[1.0:-0.01:0.85 1.0:0.01:1.15];
 steprates = steprates_rel.*sr_norm;
 
 for i = 1:length(steprates)
@@ -174,7 +172,7 @@ end
 isSymmetric = 1;
 initialGuess = resultFileStanding;
            
-% Solve the optimization problem
+% Solve the optimization problem with free steprate
 if exist([resultFileWalkingHigh '.mat'], 'file') == 0
     problemWalkingHigh = ExoPaper.walking2D_exo(model_high, Wtrack, resultFileWalkingHigh, trackingData, targetSpeed, [], isSymmetric, initialGuess);
     solver = IPOPT();
@@ -188,21 +186,26 @@ else
     resultWalkingHigh = result;
 end
 
+% Save the optimal steprate
+idur = resultWalkingHigh.problem.idx.dur;
+sr_high = 60/(resultWalkingHigh.X(idur)*2);
+
 %Now between 85% and 115% of the steprate for normal walking
-resultFileWalkingHigh_now = [resultFileWalkingHigh '_relsteprate_fromprev_' num2str(steprates_rel(i)*100)];
 for i = 1:length(steprates) 
     trackingData = TrackingData.loadStruct(dataFile);
     targetSpeed = trackingData.extractData('speed', 'speed').variables.mean{1};
 
+    isSymmetric = 1;
+    if i > 1
+        initialGuess = resultFileWalkingHigh_now;
+    else
+        initialGuess = resultFileWalking;
+    end
+    
+    resultFileWalkingHigh_now = [resultFileWalkingHigh '_relsteprate_fromprev_' num2str(steprates_rel(i)*100)];
     % Solve the optimization problem
     if exist([resultFileWalkingHigh_now '.mat'], 'file') == 0
-        isSymmetric = 1;
-        if i > 1
-            initialGuess = resultFileWalkingHigh_now;
-        else
-            initialGuess = resultFileWalking;
-        end
-        
+
         problemWalkingHigh = ExoPaper.walking2D_exo(model_high, Wtrack, resultFileWalkingHigh_now, trackingData, targetSpeed, 1/(steprates(i)/30), isSymmetric, initialGuess);
         solver = IPOPT();
         resultWalkingHigh = solver.solve(problemWalkingHigh);
@@ -225,8 +228,8 @@ trackingData = TrackingData.loadStruct(dataFile);
 targetSpeed = trackingData.extractData('speed', 'speed').variables.mean{1};
 
 if useRandomParticipant
-	model_high = Gait2dc_Exo(sr_norm, 'dur', penalizeLow, modelFile, body_length, weight); % we use the height and weight that were defined before
-	model_high = model1.getSameRandomParticipant(SDmusParamMatrix); % we use the muscle parameters that were defined before
+	model_low = Gait2dc_Exo(sr_norm, 'dur', penalizeLow, modelFile, body_length, weight); % we use the height and weight that were defined before
+	model_low = model1.getSameRandomParticipant(SDmusParamMatrix); % we use the muscle parameters that were defined before
 else
 	model_low = Gait2dc_Exo(sr_norm, 'dur', penalizeLow, modelFile);
 end
@@ -243,24 +246,30 @@ if exist([resultFileWalkingLow '.mat'], 'file') == 0
     resultWalkingLow.save(resultFileWalkingLow);
 else
     disp('Solution already exists')
-    load(resultFileWalkingHigh)
+    load(resultFileWalkingLow)
     resultWalkingLow = result;
 end
 
-resultFileWalkingLow_now = [resultFileWalkingLow '_relsteprate_fromprev_' num2str(steprates_rel(i)*100)];
+% Save the optimal steprate
+idur = resultWalkingLow.problem.idx.dur;
+sr_low = 60/(resultWalkingLow.X(idur)*2);
+
 for i = 1:length(steprates)
     trackingData = TrackingData.loadStruct(dataFile);
     targetSpeed = trackingData.extractData('speed', 'speed').variables.mean{1};
 
+    isSymmetric = 1;
+    if i > 1
+        initialGuess = resultFileWalkingLow_now;
+    else
+        initialGuess = resultFileWalking;
+    end
+    
+    resultFileWalkingLow_now = [resultFileWalkingLow '_relsteprate_fromprev_' num2str(steprates_rel(i)*100)];
+
     % Solve the optimization problem
     if exist([resultFileWalkingLow_now '.mat'], 'file') == 0
-        isSymmetric = 1;
-        if i > 1
-            initialGuess = resultFileWalkingLow_now;
-        else
-            initialGuess = resultFileWalking;
-        end
-        
+    
         problemWalkingLow = ExoPaper.walking2D_exo(model_low, Wtrack, resultFileWalkingLow_now, trackingData, targetSpeed, 1/(steprates(i)/30), isSymmetric, initialGuess);
     
         % Create solver and change solver settings
@@ -275,3 +284,44 @@ for i = 1:length(steprates)
         resultWalkingHigh = result;
     end
 end
+
+%% Results: Plot metabolic cost of all simulations
+MetModel = 'margaria';
+
+load(resultFileWalking)
+MetCost_base = result.problem.getMetabolicCost(result.X, MetModel);
+
+load(resultFileWalkingHigh)
+MetCostHigh_base = result.problem.getMetabolicCost(result.X, MetModel);
+
+load(resultFileWalkingLow)
+MetCostLow_base = result.problem.getMetabolicCost(result.X, MetModel);
+
+for i = 1: length(steprates)
+    resultFileWalking_now = [resultFileWalking '_relsteprate_fromprev_' num2str(steprates_rel(i)*100)];
+    load(resultFileWalking_now)
+    MetCost(i) = result.problem.getMetabolicCost(result.X, MetModel);
+    
+    resultFileWalkingHigh_now = [resultFileWalkingHigh '_relsteprate_fromprev_' num2str(steprates_rel(i)*100)];
+    load(resultFileWalkingHigh_now)
+    MetCostHigh(i) = result.problem.getMetabolicCost(result.X, MetModel);
+    
+    resultFileWalkingLow_now = [resultFileWalkingLow '_relsteprate_fromprev_' num2str(steprates_rel(i)*100)];
+    load(resultFileWalkingLow_now)
+    MetCostLow(i) = result.problem.getMetabolicCost(result.X, MetModel);
+end
+
+
+figure
+hold on
+plot(steprates,MetCost, '.k')
+plot(steprates,MetCostHigh, '.b')
+plot(steprates,MetCostLow, '.r')
+
+plot(sr_norm,MetCost_base,'+k')
+plot(sr_high,MetCostHigh_base,'+b')
+plot(sr_low,MetCostLow_base,'+r')
+
+xlabel('Step rate per minute')
+ylabel('Metabolic Cost (J/kg/m)')
+legend('No Exo', 'Penalize High', 'Penalize Low', 'No Exo - Free Steprate', 'Penalize High - Free Steprate', 'Penalize Low - Free Steprate', 'Location', 'NorthWest')
