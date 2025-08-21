@@ -61,6 +61,7 @@ On the other hand, we can use so-called reconstructive simulations to estimate v
 **instead allowing biomechanical variables to be estimated accurately from wearable or contactless sensors, such as inertial sensors. Wide-spread measurement of movements and their biomechanical analysis are vital to be able to **
 **reach a deep understanding** of human movement.
 
+# BioMAC-Sim-Toolbox
 Here, we present the `BioMAC-Sim-Toolbox`, a MATLAB toolbox that can be used to simulate
 and analyse human movements. **This toolbox is released under an Apache-2.0 license and can be accessed on GitHub: <https://github.com/mad-lab-fau/BioMAC-Sim-Toolbox>.** The main functionality of the toolbox is that it solves trajectory optimization problems, or optimal control problems, for human musculoskeletal dynamics models. These dynamics models combine multibody 
 dynamics to model the movements of the skeleton with muscle dynamics models to model the dynamics of muscular 
@@ -135,6 +136,7 @@ the lumbar joint locked, called `gait2d_osim`.
 | gait3d          |      3D        |          33        |         92        |       10             |[@nitschke:2020; @nitschke:2023; @nitschke:2024] |
 **Table 1:** Overview of dynamics models implemented in the BioMAC-Sim-Toolbox
 
+# Using the Toolbox
 **To get started, we recommend that users first look at the tutorial in the folder `Tutorial` and the folder `IntroductionExamples` in 
 **`ExampleScripts`. The tutorial is created to help users become familiar with the inputs and outputs of the simulations, as well as create and run simulations.
 **To perform the tutorial, users should start by looking at the file TutorialInTheWild.PDF. In addition, we have added an introductory example for 2D simulations (`script2D.m`) and
@@ -169,6 +171,7 @@ types of simulations can be generated and the movement kinematics and kinetics i
 **accurate as higher-order schemes, which are implemented in the other toolboxes. We are currently working on an implementation of higher order 
 **collocation schemes as well, and plan to add methods up to the fifth order, which are two-step and three-step. 
 
+#Future Work
 In future, the toolbox could be expanded. **We invite users to suggest new features by creating issues and also to help implement them through pull requests. We encourage 
 **users to add models, objective and constraint functions to the toolbox to expand the range of optimal control problems that can be solved.** Furthermore, new problem 
 classes can be defined, for example for inverse kinematics and inverse dynamics, or to solve muscle activations and excitations statically or dynamically. It would also 
@@ -177,7 +180,6 @@ be possible to implement single shooting approach, which would allow for models 
 **outcomes as as good as possible for their research questions.
 
 # Acknowledgements
-
 We acknowledge contributions from Marko Ackermann, Dieter Heinrich, Maria Eleni Athanasiadou, Chuyi Wang, Christopher Löffelmann, Linus Hötzel, Utkarsha Shukla, Arne Kuederle, Tobias Luckfiel, Heiko Schlarb. The development of the BioMAC-Sim-Toolbox was supported by adidas AG and by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) through Project-ID442419336, SFB 1483 - EmpkinS and through Project-ID520189992
 
 # References
