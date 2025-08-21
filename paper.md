@@ -171,7 +171,7 @@ types of simulations can be generated and the movement kinematics and kinetics i
 **accurate as higher-order schemes, which are implemented in the other toolboxes. We are currently working on an implementation of higher order 
 **collocation schemes as well, and plan to add methods up to the fifth order, which are two-step and three-step. 
 
-#Future Work
+# Future Work
 In future, the toolbox could be expanded. **We invite users to suggest new features by creating issues and also to help implement them through pull requests. We encourage 
 **users to add models, objective and constraint functions to the toolbox to expand the range of optimal control problems that can be solved.** Furthermore, new problem 
 classes can be defined, for example for inverse kinematics and inverse dynamics, or to solve muscle activations and excitations statically or dynamically. It would also 
