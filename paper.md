@@ -118,23 +118,23 @@ As most analysis is specific to the problem type, most code for analysis can be 
 We have implemented different human dynamics models (see Table 1). All implemented models are musculoskeletal models, but they can 
 also be used as skeletal models, such that the input is generated using joint moments instead of muscle **excitations**. 
 We have implemented a 3D model version (`gait3d`) and two 2D model versions in c, which are compiled as mex functions. The model dynamics can be 
-tested using the test cases coded in the `tests` folder. The **model parameters of the** 3D model and one 2D model (`gait2d_osim`) are loaded from OpenSim, but use our own 
-muscle dynamics model, which is described in [@nitschke:2020], while the other (`gait2dc`) is used in our own previous work 
+tested using the test cases coded in the `tests` folder. The **model parameters of the** 3D model and two 2D model (`gait2d_osim` and `gait10dof18musc`) are loaded from OpenSim, but use our own 
+muscle dynamics model described in [@nitschke:2020], while the other **2D model** (`gait2dc`) is used **and described** in our own previous work 
 [@koelewijn:2016; @koelewijn:2022; @dorscky:2019a; @dorschky:2019b]. The model parameters are defined in the .osim file for the OpenSim models, 
 and defined in an Excel file for model gait2dc (gait2dc_par.xlsx). The models can be personalized by directly adjusting the parameters in the 
 .osim model or Excel file, such that, for example, OpenSim scaling can be used [@seth:2018]. They can also still be adjusted in MATLAB, for 
-example to investigate virtual participants [@dorscky:2019a; @koelewijn:2022]. The model dynamics are explained further for `gait2dc` in
-@koelewijn:2022; @dorscky:2019a; @dorschky:2019b and for `gait3d` in @nitschke:2020. **The `gait2d_osim model` has been used in @gambietz:2024.** 
-It is based on the `gait10dof18musc.osim` model [@seth:2018], and can be loaded in two ways: the original version, called `gait10dof18musc`, and a version with 
-the lumbar joint locked, called `gait2d_osim`.
+example to investigate virtual participants [@dorscky:2019a; @koelewijn:2022]. The model dynamics are explained further in
+@koelewijn:2022; @dorscky:2019a; @dorschky:2019b for `gait2dc` and in @nitschke:2020 for `gait3d`. **The `gait2d_osim model` has been used in @gambietz:2024.** 
+**It is based on the `gait10dof18musc.osim` model [@seth:2018], and can be loaded in two ways: the original version, called `gait10dof18musc`, and a version with 
+**the lumbar joint locked, called `gait2d_osim`.
 
+**Table 1:** Overview of dynamics models implemented in the BioMAC-Sim-Toolbox
 | Model Name      | Dimensionality | Degrees of freedom | Number of muscles | Arm torque actuators | Source | 
 | --------------- | -------------  | ------------------ | ----------------  | -------------------- | ------ | 
 | gait2dc         |      2D        |          9         |         16        |    -                 |[@koelewijn:2016; @koelewijn:2022; @dorscky:2019a; @dorschky:2019b] |
 | gait2d_osim     |      2D        |          9         |         18        |    -                 |[@seth:2018]
 | gait10dof18musc |      2D        |          10        |         18        |    -                 |[@seth:2018]
 | gait3d          |      3D        |          33        |         92        |       10             |[@nitschke:2020; @nitschke:2023; @nitschke:2024] |
-**Table 1:** Overview of dynamics models implemented in the BioMAC-Sim-Toolbox
 
 # Using the Toolbox
 **To get started, we recommend that users first look at the tutorial in the folder `Tutorial` and the folder `IntroductionExamples` in 
@@ -154,7 +154,7 @@ the lumbar joint locked, called `gait2d_osim`.
 **is based on the publication by @nitschke:2024. The code in `Treadmill`  can be used to generate simulations of walking on the treadmill. This example
 **is not based on published work, but was added to show two how a treadmill can be implemented in the ground contact model and how the `gait2d_osim` model can be used in the `BioMAC-Sim-Toolbox`.
 
-Currently, the toolbox can be used to solve trajectory optimization problems to solve predictive and reconstructive simulations. We have implemented code to track marker positions, joint angles, translations, ground reaction forces, 
+Currently, the toolbox can be used to solve trajectory optimization problems and create predictive and reconstructive simulations. We have implemented code to track marker positions, joint angles, translations, ground reaction forces, 
 accelerations, angular velocities, movement 
 duration, and movement speed. We have further implemented objectives to minimize muscular effort, metabolic cost, squared torque, joint 
 accelerations, passive joint moments, ground reaction force impact, and head stability. By combining these different objectives, many different 
@@ -169,7 +169,8 @@ types of simulations can be generated and the movement kinematics and kinetics i
 **data and therefore are limited to predictive simulations, while the `BioMAC-Sim-Toolbox` can be used for both tracking and predictive simulations. 
 **A disadvantage of the `BioMAC-Sim-Toolbox` is that we have, so far, only implemented one-step discretization schemes, which are not as 
 **accurate as higher-order schemes, which are implemented in the other toolboxes. We are currently working on an implementation of higher order 
-**collocation schemes as well, and plan to add methods up to the fifth order, which are two-step and three-step. 
+**collocation schemes as well, and plan to add methods up to the fifth order, which are two-step and three-step. Another disadvantage is that we 
+**have currently only implemented IPOPT as a solver. In the future, we aim to add other open-source solvers, such as, for example WORHP [@bueskens:2013].
 
 # Future Work
 In future, the toolbox could be expanded. **We invite users to suggest new features by creating issues and also to help implement them through pull requests. We encourage 
