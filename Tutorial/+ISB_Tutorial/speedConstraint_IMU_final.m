@@ -16,7 +16,7 @@
 %> @param X             Double array: State vector containing at least speed of the movement
 %> @param targetSpeed   Double: target speed to reach
 %======================================================================
-function output = speedConstraint(obj,option,X,targetSpeed)
+function output = speedConstraint_IMU(obj,option,X,targetSpeed)
 %% check input parameter
 if  ~isfield(obj.idx,'speed') % check whether controls are stored in X
     error('State vector X does not contain speed.')

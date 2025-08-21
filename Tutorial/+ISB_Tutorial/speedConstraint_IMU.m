@@ -16,7 +16,7 @@
 %> @param X             Double array: State vector containing at least speed of the movement
 %> @param targetSpeed   Double: target speed to reach
 %======================================================================
-function output = speedConstraint(obj,option,X,targetSpeed)
+function output = speedConstraint_IMU(obj,option,X,targetSpeed)
 %% check input parameter
 if  ~isfield(obj.idx,'speed') % check whether controls are stored in X
     error('State vector X does not contain speed.')
@@ -27,10 +27,10 @@ end
 speed = X(obj.idx.speed);
 
 if strcmp(option,'confun') %constraints of periodicity constraint
-    output =  speed - targetSpeed;   
+    % output =    % TODO1. Add code here. We want to constrain the difference between speed and targetSpeed
 elseif strcmp(option,'jacobian') %jacobian of periodicity constraint
     output = spalloc(1,length(X),obj.Jnnz);
-    output(1, obj.idx.speed) = 1;    
+    %output(1, ) = ; % TODO 2. Add the constraint's derivative at the correct index. Make sure to use the derivative of the function in line 33    
 else
     error('Unknown option');
 end
