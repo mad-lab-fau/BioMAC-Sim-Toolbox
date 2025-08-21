@@ -129,6 +129,7 @@ example to investigate virtual participants [@dorscky:2019a; @koelewijn:2022]. T
 **the lumbar joint locked, called `gait2d_osim`.
 
 **Table 1:** Overview of dynamics models implemented in the BioMAC-Sim-Toolbox
+
 | Model Name      | Dimensionality | Degrees of freedom | Number of muscles | Arm torque actuators | Source | 
 | --------------- | -------------  | ------------------ | ----------------  | -------------------- | ------ | 
 | gait2dc         |      2D        |          9         |         16        |    -                 |[@koelewijn:2016; @koelewijn:2022; @dorscky:2019a; @dorschky:2019b] |
