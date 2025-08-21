@@ -24,7 +24,7 @@ When calling a model for the first time, it will be compiled automatically. If y
 ### Dependencies
 
 - **MATLAB Compiler**: Required. On Windows, install MinGW via [these instructions](https://nl.mathworks.com/matlabcentral/answers/311290-faq-how-do-i-install-the-mingw-compiler).
-- **IPOPT**: Use [mexIPOPT](https://github.com/ebertolazzi/mexIPOPT). Mac users with Apple Silicon should follow [these instructions](https://github.com/ebertolazzi/mexIPOPT/issues/24).
+- **IPOPT**: Use [mexIPOPT](https://github.com/ebertolazzi/mexIPOPT). Mac users with Apple Silicon should follow [these instructions](https://github.com/ebertolazzi/mexIPOPT/issues/24). For Linux users using gcc versions > 9, use [our mexIPOPT fork](https://github.com/gambimar/mexIPOPT/)
 - **OpenSim (Optional)**: Needed for `gait3d` and `gait2d_osim` models. Supported versions: 3.3, 4.0–4.5. For macOS, OpenSim is currently not supported when using native Apple Silicon MATLAB versions. 
 
 You can use the model gait3d, or gait2d_osim, without an OpenSim installation: We have included .mat files that allow you to use the base models and those used in the ExampleScripts without an OpenSim installation. In that case, you should not recalculate the moment arms, which requires OpenSim.
