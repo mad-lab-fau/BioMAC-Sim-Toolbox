@@ -78,7 +78,7 @@ $$ \mathbf{x_L} \leq \mathbf{x}(t) \leq \mathbf{x_U} \ \text{for }0 \leq t \leq 
 $$ \mathbf{u_L} \leq \mathbf{u}(t) \leq \mathbf{u_U} \ \text{for }0 \leq t \leq T \quad \text{(bounds on controls)} $$
 
 for a musculoskeletal model with state $x$ and input $u$. Here, the goal is to find the initial state, $\mathbf{x}(0)$, control inputs, $\mathbf{u}(t)$,
-and duration, $T$, that minimize the cost function, $J(\mathbf{x}, \mathbf{u})$. The cost function consists of $c_{j}(\mathbf{x}(t),\mathbf{u}(t))$, which 
+and duration, $T$, that minimize the cost function, $J(\mathbf{x}, \mathbf{u})$ while following the system dynamics \mathbf{f}. The cost function consists of $c_{j}(\mathbf{x}(t),\mathbf{u}(t))$, which 
 describes the cost functions that are evaluated over time, which are multiplied with associated **weight** $W_{j}$, and of a final cost function $c_f(\mathbf{x}(T),\mathbf{u}(T))$, which is only evaluated at the end of the trajectory, at time $T$. We normally do not include a final cost function. The subscript $L$ defines the lower bounds, while $U$ defines the upper bounds. When speed or duration is known, we commonly still include them into the optimization variables, while making the lower and upper bound equal to the desired value. 
 
 For walking and running, we include a periodicity constraint to the full gait cycle or a single step, in case of a symmetric motion. This constraint can be defined for straight and curved running and walking [@nitschke:2020] through the displacement in the horizontal plane. This periodicity constraint ensures that the states are the same at the end of the trajectory as at the beginning, while applying a horizontal displacement to the states in $\mathbf{x}_{hor}$:
@@ -152,7 +152,7 @@ example to investigate virtual participants [@dorscky:2019a; @koelewijn:2022]. T
 **simulations based on inertial sensor data. This example is added to show how inertial sensor data can be tracked in a 2D musculoskeletal model,
 **and is based on the publications by @dorscky:2019a and @dorschkynitschke:2025. The code in `MarkerTracking3D` can also be used to generate tracking
 **simulations, but from marker and ground reaction force data. This example is added as an example of how the 3D musculoskeletal model has been used and
-**is based on the publication by @nitschke:2024. The code in `Treadmill`  can be used to generate simulations of walking on the treadmill. This example
+**is based on the publication by @nitschke:2024. The code in `Treadmill`  can be used to generate simulations of walking on the treadmill. This example 
 **is not based on published work, but was added to show two how a treadmill can be implemented in the ground contact model and how the `gait2d_osim` model can be used in the `BioMAC-Sim-Toolbox`.
 
 Currently, the toolbox can be used to solve trajectory optimization problems and create predictive and reconstructive simulations. We have implemented code to track marker positions, joint angles, translations, ground reaction forces, 
