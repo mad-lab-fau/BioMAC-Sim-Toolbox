@@ -78,7 +78,7 @@ $$ \mathbf{x_L} \leq \mathbf{x}(t) \leq \mathbf{x_U} \ \text{for }0 \leq t \leq 
 $$ \mathbf{u_L} \leq \mathbf{u}(t) \leq \mathbf{u_U} \ \text{for }0 \leq t \leq T \quad \text{(bounds on controls)} $$
 
 for a musculoskeletal model with state $x$ and input $u$. Here, the goal is to find the initial state, $\mathbf{x}(0)$, control inputs, $\mathbf{u}(t)$,
-and duration, $T$, that minimize the cost function, $J(\mathbf{x}, \mathbf{u})$ while following the system dynamics \mathbf{f}. The cost function consists of $c_{j}(\mathbf{x}(t),\mathbf{u}(t))$, which 
+and duration, $T$, that minimize the cost function, $J(\mathbf{x}, \mathbf{u})$ while following the system dynamics $\mathbf{f}$. The cost function consists of $c_{j}(\mathbf{x}(t),\mathbf{u}(t))$, which 
 describes the cost functions that are evaluated over time, which are multiplied with associated **weight** $W_{j}$, and of a final cost function $c_f(\mathbf{x}(T),\mathbf{u}(T))$, which is only evaluated at the end of the trajectory, at time $T$. We normally do not include a final cost function. The subscript $L$ defines the lower bounds, while $U$ defines the upper bounds. When speed or duration is known, we commonly still include them into the optimization variables, while making the lower and upper bound equal to the desired value. 
 
 For walking and running, we include a periodicity constraint to the full gait cycle or a single step, in case of a symmetric motion. This constraint can be defined for straight and curved running and walking [@nitschke:2020] through the displacement in the horizontal plane. This periodicity constraint ensures that the states are the same at the end of the trajectory as at the beginning, while applying a horizontal displacement to the states in $\mathbf{x}_{hor}$:
