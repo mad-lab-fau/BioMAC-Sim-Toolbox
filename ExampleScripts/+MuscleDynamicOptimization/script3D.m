@@ -25,7 +25,8 @@ clc
 % Get path of this script
 filePath = fileparts(mfilename('fullpath'));
 % Path to your repository
-path2repo = [filePath filesep '..' filesep '..' filesep];
+inds = strfind(filePath,'BioMAC-Sim-Toolbox');
+path2repo =  filePath(1:inds+17);
 
 % Fixed settings
 dataFolder     = 'data/MarkerTracking';               % Relative from the path of the repository
