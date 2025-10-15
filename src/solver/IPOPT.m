@@ -154,7 +154,9 @@ classdef IPOPT < Solver
             end
 
             % compute Jpattern before solving
-            problem.computeJpattern;
+            if ~isempty(problem.constraintTerms)
+                problem.computeJpattern;
+            end
             
             % run IPOPT
             timerSolve = tic;
