@@ -1217,7 +1217,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 				#if JACOBIANSIZING
 					Nalloc_dMpas_dx = 10000;
 				#else
-					Nalloc_dMpas_dx = 352;		
+					Nalloc_dMpas_dx = 354;		
 				#endif
 				plhs[1] = mxCreateSparse(nstates, NDOF, Nalloc_dMpas_dx, mxREAL);  // this is Jacobian transposed!
 				dMpas_dx = mxGetPr(plhs[1]);
@@ -1340,7 +1340,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 				#if JACOBIANSIZING
 					Nalloc_dM_dx = 10000;
 				#else
-					Nalloc_dM_dx = 352;		
+					Nalloc_dM_dx = 354;		
 				#endif
 				plhs[1] = mxCreateSparse(nstates, NDOF, Nalloc_dM_dx, mxREAL);  // this is Jacobian transposed!
 				dM_dx = mxGetPr(plhs[1]);
@@ -1442,8 +1442,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 					Nalloc_dfCE_dx = 10000;
                     Nalloc_dfCE_dxdot = 10000;
 				#else
-					Nalloc_dfCE_dx = 352;	// Used the same number as for cmdJointmoments	
-                    Nalloc_dfCE_dxdot = 352;	// Used the same number as for cmdJointmoments	
+					Nalloc_dfCE_dx = 354;	// Used the same number as for cmdJointmoments	
+                    Nalloc_dfCE_dxdot = 354;	// Used the same number as for cmdJointmoments	
 				#endif
 				plhs[1] = mxCreateSparse(nstates, nmuscles, Nalloc_dfCE_dx, mxREAL);  // this is Jacobian transposed!
 				dfCE_dx = mxGetPr(plhs[1]);
