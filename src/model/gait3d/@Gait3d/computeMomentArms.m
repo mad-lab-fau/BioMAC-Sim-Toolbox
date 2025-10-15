@@ -47,12 +47,12 @@ catch
     error('No Opensim file stored. Please read Opensime file first calling Gait3d.readOsim(filename).')
 end
 
-momentarmfile = strrep(which(settings.osimfile), '.osim', '_momentarms.mat');
+momentarmfile = strrep(settings.osimfile, '.osim', '_momentarms.mat');
 
 
 warning('Opensim library let Matlab crash if IPOPT exits with an exception. Save Gait3d model and open a new Malab session if running an optimization.');
 
-fileID = fopen(which(obj.osim.file));
+fileID = fopen(['.' obj.osim.file]);
 fileID_read =fread(fileID);
 md = java.security.MessageDigest.getInstance('SHA-256');
 osim_sha256 = typecast(md.digest(uint8(fileID_read))', 'uint8');
@@ -131,7 +131,7 @@ save(momentarmfile,'settings','momentarm_model','range_muscleMoment','osim_sha25
         % columns: # of dofs this muscle crosses
         allmomarms = zeros(size(alljnts,1),mus.dof_count);
         disp(['  number of poses: ',num2str(size(allmomarms))]);
-        [allmomarms, mus_length] = opensim_get_momentarms(which(settings.osimfile), alljnts, mus.name, mus.dof_names);
+        [allmomarms, mus_length] = opensim_get_momentarms(settings.osimfile, alljnts, mus.name, mus.dof_names);
         
         % now fit a polynomial to the Opensim results
         ndofs = mus.dof_count; % number of dofs spanned by this muscle
@@ -309,7 +309,11 @@ save(momentarmfile,'settings','momentarm_model','range_muscleMoment','osim_sha25
         end
 
         % load the model
-        Mod = Model(osimfile);
+        if exist(osimfile, 'file')
+            Mod = Model(osimfile);
+        else
+            Mod = Model(['./' osimfile]); %when file is not on path
+        end
         
         % initialize the system and get the initial state
         state = Mod.initSystem();

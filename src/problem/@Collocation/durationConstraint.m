@@ -17,6 +17,12 @@
 %> @param targetDuration    Double: target duration to reach
 %======================================================================
 function output = durationConstraint(obj,option,X,targetDuration)
+%% Skip initialization
+if strcmp(option, 'init')
+    output = nan;
+    return
+end
+
 %% check input parameter
 if  ~isfield(obj.idx,'dur') % check whether controls are stored in X
     error('State vector X does not contain duration.')

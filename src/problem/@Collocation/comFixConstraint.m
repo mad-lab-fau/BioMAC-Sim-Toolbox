@@ -21,6 +21,11 @@
 %> @param targetMotion  Double: target motion of the center of mass
 %======================================================================
 function output = comFixConstraint(obj,option,X, targetMotion)
+%% Skip initialization
+if strcmp(option, 'init')
+    output = nan;
+    return
+end
 
 % compute demanded output
 if strcmp(option,'confun')

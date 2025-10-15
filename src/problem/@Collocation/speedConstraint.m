@@ -17,6 +17,12 @@
 %> @param targetSpeed   Double: target speed to reach
 %======================================================================
 function output = speedConstraint(obj,option,X,targetSpeed)
+%% Skip initialization
+if strcmp(option, 'init')
+    output = nan;
+    return
+end
+
 %% check input parameter
 if  ~isfield(obj.idx,'speed') % check whether controls are stored in X
     error('State vector X does not contain speed.')

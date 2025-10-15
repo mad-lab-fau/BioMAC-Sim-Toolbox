@@ -97,6 +97,7 @@ function simVarTable = extractData(obj, X, settings, variableTable, getFullCycle
 % Get properties
 model = obj.model;
 objTermsNames = {obj.objectiveTerms.name};
+conTermsNames = {obj.constraintTerms.name};
 
 % Get default for settings
 if isa(model, 'quad_11DOF') || isa(model, 'Quadruped')
@@ -399,10 +400,25 @@ if isfield(settings, typeStr) && ~isempty(settings.(typeStr)) && iscellstr(setti
     % Get simulated data
     simVarTableType = obj.getSimData(X, simVarTableType);
     
-    % Get tracking data (mean and var) if it was tracked 
+    % Get tracking data (mean and var) if it was tracked or constrained
     % => There is currently no tracking method for moments!
     simVarTableType.mean = cell(height(simVarTableType), 1);
     simVarTableType.var  = cell(height(simVarTableType), 1);
+    idxConTermMoments = find(strcmp(conTermsNames, 'jointMomentConstraint')); % tracked in separate term
+    idxConTerm = [idxConTermMoments]; % If not empty, angles were tracked
+    if length(idxConTerm) == 1
+        variables = obj.constraintTerms(idxConTerm).varargin{1}.variables;
+        for iMom = 1 : height(simVarTableType)
+           idxVar = find(strcmp(variables.type, typeStr) & strcmp(variables.name, simVarTableType.name{iMom}));
+           if ~isempty(idxVar)
+               assert(strcmp(variables.unit{idxVar}, unitStr), 'Unit %s is not supported for type %s.', variables.unit{idxVar}, typeStr);
+               simVarTableType.mean{iMom} = variables.mean{idxVar};
+               simVarTableType.var{iMom}  = zeros(size(simVarTableType.mean{iMom})); %variance not used in constraint, but it cannot be empty for plotting
+           end
+        end
+    elseif length(idxObjTerm) > 1
+        error('Moments were tracked or constrained in multiple objective terms. The function extractData() can not deal with this.')   
+    end
 
     % Get additional data
     simVarTableType.mean_extra = cell(height(simVarTableType), 1);

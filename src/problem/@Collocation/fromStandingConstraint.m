@@ -22,6 +22,12 @@
 %>                      the model and speed and duration of the periodic movement
 %======================================================================
 function output = fromStandingConstraint(obj,option,X)
+%% Skip initialization
+if strcmp(option, 'init')
+    output = nan;
+    return
+end
+
 %% check input parameter
 if ~isfield(obj.idx,'states') || ~isfield(obj.idx,'controls') || ~isfield(obj.idx,'speed') || ~isfield(obj.idx,'dur') % check whether controls are stored in X
     error('State vector X does not contain required states.')

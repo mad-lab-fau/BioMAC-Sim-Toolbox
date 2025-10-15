@@ -17,26 +17,38 @@
 %>                      the model and speed and duration of the periodic movement
 %======================================================================
 function output = dynamicConstraints(obj,option,X)
+%% Skip initialization
+if strcmp(option, 'init')
+    output = nan;
+    return
+end
+
 %% check input parameter
 if ~isfield(obj.idx,'states') || ~isfield(obj.idx,'controls') || ~isfield(obj.idx,'dur') % check whether controls are stored in X
     error('Model states and controls and duration need to be stored in state vector X.')
 end
 
 %% state variable indices for semi-implicit Euler method
-% https://en.wikipedia.org/wiki/Semi-implicit_Euler_method
-% Discretization is defined by ixSIE1 (state variables from the node before the time step)
-% and ixSIE2 (state variables from the node after the time step).
-% Two versions: SIE A and SIE B. Both conserve energy.
-% SIE A appeared easier to solve in tests.  This makes sense because it uses backward
-% Euler for muscle equations. SIE B code is commented out and provided for comparison.
-% SIE A: 
-ixSIE2 = sort([obj.model.extractState('qdot'); obj.model.extractState('s'); obj.model.extractState('a')]);
-ixSIE1 = setdiff(1:obj.model.nStates, ixSIE2);
-% SIE B
-% ixSIE1 = sort([obj.model.extractState('q')]);
-% ixSIE2 = setdiff(1:obj.model.nStates, ixSIE1);
+if strcmp(obj.Euler,'SIE')
+    % https://en.wikipedia.org/wiki/Semi-implicit_Euler_method
+    % Discretization is defined by ixSIE1 (state variables from the node before the time step)
+    % and ixSIE2 (state variables from the node after the time step).
+    % Two versions: SIE A and SIE B. Both conserve energy.
+    % SIE A appeared easier to solve in tests.  This makes sense because it uses backward
+    % Euler for muscle equations. SIE B code is commented out and provided for comparison.
+    % SIE A: 
+    ixSIE2 = sort([obj.model.extractState('qdot'); obj.model.extractState('s'); obj.model.extractState('a')]);
+    ixSIE1 = setdiff(1:obj.model.nStates, ixSIE2);
+    % SIE B
+    % ixSIE1 = sort([obj.model.extractState('q')]);
+    % ixSIE2 = setdiff(1:obj.model.nStates, ixSIE1);
+end
 
-
+%% Skip initialization
+if strcmp(option, 'init')
+    output = nan;
+    return
+end
 %% compute demanded output
 nNodesDur = obj.nNodesDur;
 h = X(obj.idx.dur)/(nNodesDur-1);

@@ -66,6 +66,7 @@ classdef Collocation < Problem
         %> iteration thus to improve performance. Since it is a transient property it
         %> will not be saved when saving the object.
         objectiveInit;
+        constraintInit;
     end
 
     methods
@@ -180,16 +181,23 @@ classdef Collocation < Problem
         end
         
         %======================================================================
-        %> @brief Function initializing the objective functions
+        %> @brief Function initializing the objective and constraint functions
         %>
         %> @param   obj Collocation class object
         %======================================================================
-        function initObjectives(obj)
+        function initObjectivesConstraints(obj)
             obj.objectiveInit = struct();
             for iObj = 1:length(obj.objectiveTerms)
                 name = obj.objectiveTerms(iObj).name; % function name of objective term
                 varargin = obj.objectiveTerms(iObj).varargin; % optional input parameters of objective term
                 obj.(name)('init',[],varargin{:}); % objective value of objective term
+            end
+
+            obj.constraintInit = struct();
+            for iObj = 1:length(obj.constraintTerms)
+                name = obj.constraintTerms(iObj).name; % function name of constraint
+                varargin = obj.constraintTerms(iObj).varargin; % optional input parameters of constraint
+                obj.(name)('init',[],varargin{:}); % objective value of constraint
             end
         end
         

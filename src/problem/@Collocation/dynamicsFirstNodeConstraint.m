@@ -24,6 +24,12 @@
 %>                      the model and 'duration' of movement
 %======================================================================
 function output = dynamicsFirstNodeConstraint(obj,option,X)
+%% Skip initialization
+if strcmp(option, 'init')
+    output = nan;
+    return
+end
+
 %% check input parameter
 if ~isfield(obj.idx,'states') || ~isfield(obj.idx,'controls')   || ~isfield(obj.idx,'dur')
     error('Model states and controls and duration need to be stored in state vector X.')

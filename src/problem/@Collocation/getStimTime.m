@@ -29,6 +29,11 @@
 %> @retval t_stim         Double matrix: Activation Time (nMus x nNodesDur)
 %======================================================================
 function t_stim = getStimTime(obj, X)
+
+if ~isfield(obj.idx,'states')
+    error('Not working yet for dynamic optimization with only muscle states')
+end
+
 % Get muscle activations:
 act = X(obj.idx.states(obj.model.extractState('a'),1:obj.nNodes));
 % Threshold for activation:

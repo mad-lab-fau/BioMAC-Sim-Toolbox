@@ -26,6 +26,12 @@
 %> @param radius        Double: Radius of the circle
 %======================================================================
 function output = curveConstraint_pelvis213(obj,option,X,radius)
+%% Skip initialization
+if strcmp(option, 'init')
+    output = nan;
+    return
+end
+
 %% check input parameter
 if ~isa(obj.model,'Gait3d')
     error('Problem:curveConstraint_pelvis213','Model must be a Gait3d model for curve running')

@@ -126,12 +126,27 @@ end
 % => Avoid computing this multiple times
 % -> Extract states
 if any(ismember(idxSimTypes, idxTypesNeedState))
-    if ~isfield(obj.idx,'states') % check whether states are stored in X
+    if ~isfield(obj.idx,'states') && ~isfield(obj.idx,'states_mus') % check whether states are stored in X
         error('Collocation:getSimData', 'States are not stored in state vector X.')
     end
     % We are not interested in the states at nNodes+1 for
     % getJointMoments(), etc., but we need it to compute q, qd, qdd
-    states = X(obj.idx.states); 
+    if isfield(obj.idx,'states')
+        states = X(obj.idx.states); 
+    elseif isfield(obj.idx,'states_mus')
+        warning('Assumes that function muscleDynamicConstraints is used')
+        angles = obj.constraintInit.muscleDynamicConstraints.angles;
+        angularvelocities = obj.constraintInit.muscleDynamicConstraints.angularvelocities;
+        factorToMeas = obj.constraintInit.muscleDynamicConstraints.factorToMeas;
+        idxInModel_ang = obj.constraintInit.muscleDynamicConstraints.idxInModel_ang;
+        idxInModel_avl = obj.constraintInit.muscleDynamicConstraints.idxInModel_avl;
+        idxInModel_mus = obj.constraintInit.muscleDynamicConstraints.idxInModel_mus;
+        
+        states = zeros(obj.model.nStates,obj.nNodes+1);
+        states(idxInModel_ang,:) = angles*factorToMeas;
+        states(idxInModel_avl,:) = angularvelocities*factorToMeas;
+        states(idxInModel_mus,:) = X(obj.idx.states_mus); 
+    end
 end
 % -> Extract duration
 if any(ismember(idxSimTypes, idxTypesNeedDur))
@@ -549,7 +564,11 @@ for iType = 1 : length(simTypes)
             idxSimVar = model.extractControl('u',simVar.name(idxVar));
 
             %Find t_stim, stimulation at beginning of gait cycle
-            t_stim = obj.getStimTime(X);
+            if strcmp(modelName,'bhargava') || strcmp(modelName,'lichtwark') 
+                t_stim = obj.getStimTime(X);
+            else
+                t_stim = zeros(obj.model.nMus,nNodesDur);
+            end
 
             bodymass = model.bodymass;          % Bodymass in kg
             

@@ -20,6 +20,12 @@
 %>                      the model and speed and duration of the periodic movement
 %======================================================================
 function output = equilibriumConstraints(obj,option,X)
+%% Skip initialization
+if strcmp(option, 'init')
+    output = nan;
+    return
+end
+
 %% check input parameter
 if ~isfield(obj.idx,'states') || ~isfield(obj.idx,'controls')  % check whether controls are stored in X
     error('Model states and controls need to be stored in state vector X.')
@@ -33,17 +39,23 @@ iNode = 1; % always do it for node 1
 ix = obj.idx.states(:,iNode);
 iu = obj.idx.controls(:,iNode);
 
-% Get input for dynamics
-x = X(ix);
-xd = zeros(size(x)); % state derivatives (zero in equilibrium)
-u = X(iu);
+if strcmp(option, 'init')
+    output = nan;
+elseif strcmp(option,'confun')
 
-if strcmp(option,'confun')
-
+    % Get input for dynamics
+    x = X(ix);
+    xd = zeros(size(x)); % state derivatives (zero in equilibrium)
+    u = X(iu);
     % dynamic equations must be zero
     output = obj.model.getDynamics(x,xd,u);
 
 elseif strcmp(option,'jacobian')
+    % Get input for dynamics
+    x = X(ix);
+    xd = zeros(size(x)); % state derivatives (zero in equilibrium)
+    u = X(iu);
+    
     output = spalloc(nconstraintspernode,length(X),obj.Jnnz);
 
     [~, dfdx, ~, dfdu] = obj.model.getDynamics(x,xd,u);

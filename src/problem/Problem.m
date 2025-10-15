@@ -63,8 +63,8 @@ classdef (Abstract) Problem < handle
         %> @brief Function to test the whole problem which was defined
         % ======================================================================
         function derivativetest(obj, xr)
-            if ismethod(obj,'initObjectives')
-                obj.initObjectives;
+            if ismethod(obj,'initObjectivesConstraints')
+                obj.initObjectivesConstraints;
             end
 
             obj.computeJpattern;

@@ -1047,14 +1047,18 @@ classdef Gait3d < Model
             end
             
             % load or compute moment arms
-            filename = strrep(obj.osim.file,'.osim','_momentarms.mat');
-            filename = strsplit(filename,{'/','\'});
+            filename_full = strrep(obj.osim.file,'.osim','_momentarms.mat');
+            filename = strsplit(filename_full,{'/','\'});
             filename = which(filename{end});
-            if ~exist(filename, 'file')
+            if ~exist(filename, 'file') %&& ~exist(filename_full, 'file')
                 disp('Momentarm file could not be found. Momentarms will be computed.')
                 obj.computeMomentArms(range_muscleMoment); % compute moment arms
             end
-            load(which(filename),'momentarm_model','osim_sha256');
+            if ~isempty(filename)
+                load(which(filename),'momentarm_model','osim_sha256');
+            else
+                load(filename_full,'momentarm_model','osim_sha256');
+            end
             if (osim_sha256 ~= obj.osim.sha256) & ~strcmp(computer,'MACA64') % OpenSim is not supported on Apple Silicon Mac
                 b = input('The momentarm file is not up-to-date. Do you want new polynomials? (Y or N)','s');
                 if (b(1) == 'Y') || (b(1) == 'y')

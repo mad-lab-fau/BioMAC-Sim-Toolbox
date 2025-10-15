@@ -32,12 +32,18 @@ fctname = 'effortTermMusclesAct';
 if strcmp(option,'init')
 
     % check input parameter
-    if ~isfield(obj.idx,'states') % check whether states are stored in X
+    if ~isfield(obj.idx,'states') && ~isfield(obj.idx,'states_mus') % check whether states are stored in X
         error('Model states are not stored in state vector X.')
     end
 
     % initialize some variables (faster to get it once; even though they are not so expensive)
-    obj.objectiveInit.(fctname).idxActAllNodes = obj.idx.states(obj.model.extractState('a'), 1:obj.nNodes);
+    if isfield(obj.idx,'states') 
+        obj.objectiveInit.(fctname).idxActAllNodes = obj.idx.states(obj.model.extractState('a'), 1:obj.nNodes);
+    elseif isfield(obj.idx,'states_mus')
+        obj.objectiveInit.(fctname).idxActAllNodes = obj.idx.states_mus(:, 1:obj.nNodes);
+    else
+        error('unknown type of states in indices.')
+    end
 
     nAct = size(obj.objectiveInit.(fctname).idxActAllNodes, 1);
     if nargin < 4

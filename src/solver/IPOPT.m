@@ -149,8 +149,8 @@ classdef IPOPT < Solver
             X0 = problem.initialguess.X;
             
             % intialize the objectives
-            if ismethod(problem,'initObjectives')
-                problem.initObjectives;
+            if ismethod(problem,'initObjectivesConstraints')
+                problem.initObjectivesConstraints;
             end
 
             % compute Jpattern before solving
