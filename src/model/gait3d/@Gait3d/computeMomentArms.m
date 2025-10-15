@@ -52,7 +52,7 @@ momentarmfile = strrep(settings.osimfile, '.osim', '_momentarms.mat');
 
 warning('Opensim library let Matlab crash if IPOPT exits with an exception. Save Gait3d model and open a new Malab session if running an optimization.');
 
-fileID = fopen(['.' obj.osim.file]);
+fileID = fopen(obj.osim.file);
 fileID_read =fread(fileID);
 md = java.security.MessageDigest.getInstance('SHA-256');
 osim_sha256 = typecast(md.digest(uint8(fileID_read))', 'uint8');

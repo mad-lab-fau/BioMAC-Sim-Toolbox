@@ -67,8 +67,9 @@ opensimVersion45 = '4.5';
 % basic model parameters
 model.osim.name = char(Mod.getName());
 save_path = osim_path(strfind(char(Mod.getInputFileName()), 'model')-1:end);
-if length(save_path) == 0 %The above option does not work for models that are stored in another location
-    save_path = osim_path(strfind(char(Mod.getInputFileName()), '+')-1:end);
+if length(save_path) == 0 %The above option only works for osim files stored in the model folder. If this is not the case, we find the path from \BioMAC-Sim-Toolbox\, and replace BioMAC-Sim-Toolbox with ..
+    part_path = osim_path(strfind(char(Mod.getInputFileName()), 'BioMAC-Sim-Toolbox'):end);
+    save_path = strrep(part_path,'BioMAC-Sim-Toolbox', '..');
 end
 if length(save_path) == 0
     error('Path for saving not well defined. Note that save_path should be findable from the current MATLAB path')

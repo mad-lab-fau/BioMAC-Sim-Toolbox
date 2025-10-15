@@ -25,7 +25,8 @@ clc
 filePath = fileparts(mfilename('fullpath'));
 
 % Path to your repository
-path2repo = [filePath filesep '..' filesep '..'];
+inds = strfind(filePath,'BioMAC-Sim-Toolbox');
+path2repo =  filePath(1:inds+17);
 participant = 'Participant_02';
 
 % Trial names

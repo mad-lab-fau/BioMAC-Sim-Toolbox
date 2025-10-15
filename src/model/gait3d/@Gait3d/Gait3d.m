@@ -1048,9 +1048,9 @@ classdef Gait3d < Model
             
             % load or compute moment arms
             filename_full = strrep(obj.osim.file,'.osim','_momentarms.mat');
-            filename = strsplit(filename_full,{'/','\'});
-            filename = which(filename{end});
-            if ~exist(filename, 'file') %&& ~exist(filename_full, 'file')
+            filename_parts = strsplit(filename_full,{'/','\'});
+            filename = which(filename_parts{end});
+            if ~exist(filename, 'file') && ~exist(filename_full, 'file')
                 disp('Momentarm file could not be found. Momentarms will be computed.')
                 obj.computeMomentArms(range_muscleMoment); % compute moment arms
             end
