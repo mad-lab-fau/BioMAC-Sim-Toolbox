@@ -4,8 +4,8 @@
 %> @details
 %> Details: Collocation::muscleDynamicConstraints()
 %>
-%> @author Eva Dorschky
-%> @date November, 2017
+%> @author Anne Koelewijn
+%> @date September, 2025
 %======================================================================
 
 %======================================================================
@@ -18,11 +18,13 @@
 %> @param option        String parsing the demanded output
 %> @param X             Double array: State vector containing at least 'states' and 'controls' of
 %>                      the model and speed and duration of the periodic movement
-%> @param data          TrackingData: the full dynamics state will be
-%>                      created using the 'angles' and 'moments' from the data
+%> @param angleData     TrackingData: the full dynamics state will be
+%>                      created using the 'angles' from the data
+%> @param dur           Double: motion duration used to calculate time step
 %> @param isPeriodic    Boolean: 1 is motion is periodic, 0 otherwise
+%> @param momData       (optional) TrackingData: joint moments if they are to be directly applied to the model (e.g., gait3d_pelvis213)
 %======================================================================
-function output = muscleDynamicConstraints(obj,option,X,angleData, dur, isPeriodic)
+function output = muscleDynamicConstraints(obj,option,X,angleData, dur, isPeriodic, momData)
 %% check input parameter
 if ~isfield(obj.idx,'states_mus') || ~isfield(obj.idx,'controls') % check whether controls are stored in X
     error('Model states and controls and duration need to be stored in state vector X.')
@@ -80,6 +82,20 @@ if strcmp(option,'init')
         obj.constraintInit.(fctname).factorToMeas = pi/180;
     end
 
+    if nargin == 7
+        obj.constraintInit.(fctname).useMom = 1;
+        moments = momData.variables(strcmp(momData.variables.type, 'moment'), :);
+        for iMom = 1:height(moments)
+            obj.constraintInit.(fctname).moments(iMom,:) = moments.mean{iMom}/obj.model.mExtraScaleFactor;
+        end
+        if isPeriodic
+            obj.constraintInit.(fctname).moments(:,end+1) = obj.constraintInit.(fctname).moments(:,1);
+        end
+        obj.constraintInit.(fctname).idxInControl_mom = obj.model.extractControl('torque', moments.name); % model indices of joint moments
+    else
+        obj.constraintInit.(fctname).useMom = 0;
+    end
+
     % Return a dummy value
     output = NaN;
     return;
@@ -97,6 +113,12 @@ idxInModel_mus = obj.constraintInit.(fctname).idxInModel_mus;
 nNodesDur = obj.nNodesDur;
 h = obj.constraintInit.(fctname).h;
 nconstraintspernode = length(idxInModel_mus);
+
+useMom = obj.constraintInit.(fctname).useMom;
+if useMom
+    moments = obj.constraintInit.(fctname).moments;
+    idxInControl_mom = obj.constraintInit.(fctname).idxInControl_mom;
+end
 
 if isPeriodic
     nNodesEnd = nNodesDur;
@@ -122,6 +144,9 @@ if strcmp(option,'confun')
 
         xd =(x2-x1)/h;
         u = X(obj.idx.controls(:,iNode+1));
+        if useMom
+            u(idxInControl_mom) = moments(:,iNode+1);
+        end
         
         if strcmp(obj.Euler,'BE')
             f = obj.model.getDynamics(x2,xd,u);	% backward Euler discretization
@@ -160,6 +185,9 @@ elseif strcmp(option,'jacobian')
 
         xd =(x2-x1)/h;
         u = X(obj.idx.controls(:,iNode+1));
+        if useMom
+            u(idxInControl_mom) = moments(:,iNode+1);
+        end
 
         if strcmp(obj.Euler,'BE')
             [~, dfdx, dfdxdot, dfdu] = obj.model.getDynamics(x2,xd,u);
@@ -177,7 +205,10 @@ elseif strcmp(option,'jacobian')
             output(ic,ix2) = dfdxdot(idxInModel_mus,idxInModel_mus)'/h;
             output(ic,ix1(ixSIE1)) = output(ic,ix1(ixSIE1)) + dfdx(ixSIE1,:)';
             output(ic,ix2(ixSIE2)) = output(ic,ix2(ixSIE2)) + dfdx(ixSIE2,:)';
-		end
+        end
+        if useMom
+            dfdu(idxInControl_mom,:) = []; %only use muscle states for derivative.
+        end
         output(ic,iu) = dfdu(:,idxInModel_mus)';
         
     end

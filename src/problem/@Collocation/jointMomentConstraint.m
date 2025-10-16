@@ -22,7 +22,7 @@
 %> @retval  output  vector with differences between joint moments from 
 %>                  simulation and measurement, or corresponding Jacobian
 %======================================================================
-function output = jointMomentConstraint(obj,option,X,momData, angData, dur, isPeriodic)
+function output = jointMomentConstraint(obj,option,X,momData, angData, dur, isPeriodic,torque_names)
 
 fctname = 'jointMomentConstraint';
 
@@ -69,6 +69,22 @@ if strcmp(option,'init')
         obj.constraintInit.(fctname).factorToMeas = pi/180;
     end
 
+    if nargin == 8
+        obj.constraintInit.(fctname).useMom = 1;
+        torqueData = momData.extractData('moment',torque_names);
+        input_moments = torqueData.variables;
+        %torque_names);
+        for iMom = 1:height(input_moments)
+            obj.constraintInit.(fctname).input_moments(iMom,:) = input_moments.mean{iMom}/obj.model.mExtraScaleFactor;
+        end
+        if isPeriodic
+            obj.constraintInit.(fctname).input_moments(:,end+1) = obj.constraintInit.(fctname).input_moments(:,1);
+        end
+        obj.constraintInit.(fctname).idxInControl_mom = obj.model.extractControl('torque', torque_names); % model indices of joint moments
+    else
+        obj.constraintInit.(fctname).useMom = 0;
+    end
+    
     % Return a dummy value
     output = NaN;
     return;
@@ -77,7 +93,7 @@ end
 %% compute demanded output
 nNodesDur = obj.nNodesDur;
 
-% get variables from initalization (faster)
+% get variables from initialization (faster)
 nVars = obj.constraintInit.(fctname).nVars;
 measMean = obj.constraintInit.(fctname).measMean;
 
@@ -95,7 +111,14 @@ else
     nNodesEnd = nNodesDur - 1;
 end
 
-norm_factor = obj.model.bodymass*obj.model.gravity;
+useMom = obj.constraintInit.(fctname).useMom;
+if useMom
+    input_moments = obj.constraintInit.(fctname).input_moments;
+    idxInControl_mom = obj.constraintInit.(fctname).idxInControl_mom;
+end
+
+
+norm_factor = obj.model.bodymass*norm(obj.model.gravity);
 
 if strcmp(option,'confun')
     output = zeros(nVars*nNodesEnd,1);
@@ -107,8 +130,10 @@ if strcmp(option,'confun')
         x(idxInModel_ang) = angles(:,iNode)*factorToMeas;
         x(idxInModel_avl) = angularvelocities(:,iNode)*factorToMeas;
         x(idxInModel_mus) = X(obj.idx.states_mus(:,iNode));
-        u = X(obj.idx.controls(:,iNode+1)); %% iNode or iNode+1
-
+        u = X(obj.idx.controls(:,iNode+1));
+        if useMom
+            u(idxInControl_mom) = input_moments(:,iNode); %% iNode or iNode+1
+        end
         M = obj.model.getJointmoments(x, u);
         
         output(ic) = (M(idxInM)-measMean(iNode,:)')/norm_factor;
@@ -122,11 +147,17 @@ elseif strcmp(option,'jacobian')
         x(idxInModel_ang) = angles(:,iNode)*factorToMeas;
         x(idxInModel_avl) = angularvelocities(:,iNode)*factorToMeas;
         x(idxInModel_mus) = X(obj.idx.states_mus(:,iNode));
-        u = X(obj.idx.controls(:,iNode+1)); %% iNode or iNode+1
+        u = X(obj.idx.controls(:,iNode+1));
+        if useMom
+            u(idxInControl_mom) = input_moments(:,iNode); %% iNode or iNode+1
+        end
 
         [~, dMdx, dMdu] = obj.model.getJointmoments(x, u);
         
         output(ic, obj.idx.states_mus(:,iNode)) = dMdx(idxInModel_mus,idxInM)'/norm_factor;
+        if useMom
+            dMdu(idxInControl_mom,:) = []; %only use muscle states for derivative.
+        end
         output(ic, obj.idx.controls(:,iNode)) = dMdu(:,idxInM)'/norm_factor;
     end
 else
