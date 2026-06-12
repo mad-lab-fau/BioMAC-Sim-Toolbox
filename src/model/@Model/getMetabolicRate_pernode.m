@@ -136,4 +136,7 @@ else
     dEdotdu(obj.extractControl('u'))  = exponent*Edot.^(exponent-1).*dEdot(:, nDofs*2+4);
 
 end
+
+Edot = Edot.^exponent;
+
 end
