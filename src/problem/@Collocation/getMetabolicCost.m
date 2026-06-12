@@ -185,10 +185,10 @@ else
     dmetRatedX = dmetRatedX /  bodymass;
 
     % Metabolic cost
-    metCost    = metRate    / speed;
+    metCost    = (metRate + 1) / speed;
     dmetCostdX = dmetRatedX / speed;
     if isfield(obj.idx,'speed')
-        dmetCostdX(obj.idx.speed) = metRate*(-1/speed^2);
+        dmetCostdX(obj.idx.speed) = (metRate + 1) * (-1/speed^2) * (X(obj.idx.speed) / speed);
     end
 
     % Cost of transport
