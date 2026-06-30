@@ -33,12 +33,9 @@
 %> @retval dEdotdu     Double vector: Derivative of Edot w.r.t to u (Model.nControls x 1)
 %> @retval dEdotdT     Double: Derivative of Edot w.r.t to T
 %======================================================================
-function  [Edot, dEdotdx, dEdotdu, dEdotdxdot] = getMetabolicRate_pernode(obj, x, xdot, u, t_stim, name, getCont, epsilon, exponent) % 
+function  [Edot, dEdotdx, dEdotdu, dEdotdxdot] = getMetabolicRate_pernode(obj, x, xdot, u, t_stim, name, getCont, epsilon) % 
 
 % Check whether we should return the continuous version which is needed if we use the output for simulation 
-if nargin < 9
-    exponent = 1;
-end
 
 if nargin < 8
     getCont = 0;
@@ -123,20 +120,19 @@ else
     [dEdotdx,dEdotdxdot] = deal(zeros(size(x)));
     dEdotdu = zeros(size(u));
     % Derivatives w.r.t. q
-    dEdotdx(obj.extractState('q'))    = sum(exponent*Edot.^(exponent-1).*dEdot(:, 1:nDofs))';
+    dEdotdx(obj.extractState('q'))    = sum(dEdot(:, 1:nDofs))';
     % Derivatives w.r.t. qdot
-    dEdotdx(obj.extractState('qdot')) = sum(exponent*Edot.^(exponent-1).*dEdot(:, nDofs+(1:nDofs)))';
+    dEdotdx(obj.extractState('qdot')) = sum(dEdot(:, nDofs+(1:nDofs)))';
     % Derivatives w.r.t. s (length of contractile element)
-    dEdotdx(obj.extractState('s'))    = exponent*Edot.^(exponent-1).*dEdot(:, nDofs*2+1);
+    dEdotdx(obj.extractState('s'))    = dEdot(:, nDofs*2+1);
     % Derivatives w.r.t. a (muscle activation)
-    dEdotdx(obj.extractState('a'))    = exponent*Edot.^(exponent-1).*dEdot(:, nDofs*2+2);
+    dEdotdx(obj.extractState('a'))    = dEdot(:, nDofs*2+2);
     % Derivatives w.r.t. sdot (velocity of contractile element)
-    dEdotdxdot(obj.extractState('s'))    = exponent*Edot.^(exponent-1).*dEdot(:, nDofs*2+3);
+    dEdotdxdot(obj.extractState('s'))    = dEdot(:, nDofs*2+3);
     % Derivatives w.r.t. u (neural excitation = stimulation of muscles)
-    dEdotdu(obj.extractControl('u'))  = exponent*Edot.^(exponent-1).*dEdot(:, nDofs*2+4);
+    dEdotdu(obj.extractControl('u'))  = dEdot(:, nDofs*2+4);
 
 end
 
-Edot = Edot.^exponent;
 
 end

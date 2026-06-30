@@ -130,7 +130,7 @@ if ismember(nargout,[0 1 3 4 5])
         curStates = states(:, iNode);
 
         % Get energy for the current node
-        [Edot(:, iNode)] = obj.model.getMetabolicRate_pernode(curStates, statesd(:, iNode), controls(:,iNode), t_stim(:,iNode), name, getCont, epsilon, exponent);
+        [Edot(:, iNode)] = obj.model.getMetabolicRate_pernode(curStates, statesd(:, iNode), controls(:,iNode), t_stim(:,iNode), name, getCont, epsilon);
     end
 
     % Metabolic rate in Watts for each muscle (sum up over all nodes)
@@ -149,57 +149,77 @@ if ismember(nargout,[0 1 3 4 5])
     % Metabolic cost per muscle in J/kg/m
     metCostPerMus = sum(Edot, 2) / (nNodesDur-1) / bodymass / speed;
     dmetCostdX = 0;
-
+    
+    if strcmp(string(exponent), "log")
+        metRate = log(metRate);
+        metCost = log(metCost);
+        CoT = log(CoT);
+        metCostPerMus = log(metCostPerMus);
+    else
+        metRate = metRate.^exponent;
+        metCost = metCost.^exponent;
+        CoT = CoT.^exponent;
+        metCostPerMus = metCostPerMus.^exponent;
+    end
+    
 %% Calculate gradients only if they are needed:
 else
-    % Compute the energy for all nodes
     dmetRatedX = zeros(size(X)); 
     states = X(obj.idx.states);
     statesd = ( states(:, 2:nNodesDur) - states(:, 1:(nNodesDur-1)) ) / h;
     controls = X(obj.idx.controls);
     for iNode = 1 : nNodesDur-1
-        % Get states and controls
-        % (See Collocation.dynamicConstraints as reference)
         curStates = states(:, iNode);
-
-        % Get energy for the current node
-        [Edot(:, iNode), dEdotdx, dEdotdu, dEdotdxdot] = obj.model.getMetabolicRate_pernode(curStates, statesd(:, iNode), controls(:,iNode), t_stim(:,iNode), name, getCont, epsilon, exponent);
-
-        % Build dmetRatedX out of dmetRatedx, dmetRatedu, dmetRatedT
+        [Edot(:, iNode), dEdotdx, dEdotdu, dEdotdxdot] = obj.model.getMetabolicRate_pernode(curStates, statesd(:, iNode), controls(:,iNode), t_stim(:,iNode), name, getCont, epsilon);
+        
         dmetRatedX(obj.idx.states(:, iNode))   = dmetRatedX(obj.idx.states(:, iNode))   + dEdotdx;
         dmetRatedX(obj.idx.controls(:, iNode)) = dmetRatedX(obj.idx.controls(:, iNode)) + dEdotdu;
-
-        %Add dEdotdxdot
         dmetRatedX(obj.idx.states(:, iNode))   = dmetRatedX(obj.idx.states(:, iNode))   - dEdotdxdot/h;
         dmetRatedX(obj.idx.states(:, iNode+1)) = dmetRatedX(obj.idx.states(:, iNode+1)) + dEdotdxdot/h;
         dmetRatedX(obj.idx.dur)                = dmetRatedX(obj.idx.dur)                - sum(dEdotdxdot.*statesd(:, iNode))/h/(nNodesDur-1);
     end
-
-    % Metabolic rate in Watts for each muscle (sum up over all nodes)
-    metRate = sum(Edot, 2)  / (nNodesDur-1);
-    %To do: this should be summed over all muscles too
-    dmetRatedX = dmetRatedX / (nNodesDur-1);
-
-    % Metabolic rate in W/kg for all muscles in total
-    metRate = sum(metRate)  / bodymass;
-    dmetRatedX = dmetRatedX /  bodymass;
-
-    % Metabolic cost
+    
+    % Base variables calculations
+    metRate = sum(sum(Edot, 2) / (nNodesDur-1)) / bodymass;
+    dmetRatedX = dmetRatedX / ((nNodesDur-1) * bodymass);
+    
     metCost    = (metRate + 1) / speed;
-    dmetCostdX = dmetRatedX / speed;
-    if isfield(obj.idx,'speed')
-        dmetCostdX(obj.idx.speed) = (metRate + 1) * (-1/speed^2) * (X(obj.idx.speed) / speed);
-    end
-
-    % Cost of transport
-    CoT    = metCost    / gravity;
-    dCoTdX = dmetCostdX / gravity;
-
-    % Metabolic cost per muscle in J/kg/m
     metCostPerMus = sum(Edot, 2) / (nNodesDur-1) / bodymass / speed;
-
+    CoT    = metCost / gravity;
+    
+    % Calculate base dmetCostdX (Quotient rule: d/dx (U/V) = (U'V - UV') / V^2)
+    dmetCostdX = dmetRatedX / speed; 
+    
+    if isfield(obj.idx,'speed')
+        % speed = norm(X(obj.idx.speed))
+        % d(speed)/d(speed_idx) = X(obj.idx.speed) / speed
+        dmetCostdX(obj.idx.speed) = dmetCostdX(obj.idx.speed) - ((metRate + 1) / (speed^2)) * (X(obj.idx.speed) / speed);
+    else
+        % WARNING: If speed is calculated dynamically, you ideally need the chain rule 
+        % for d(speed)/dX here to avoid discontinuous gradients. 
+        % For now, updating the duration dependency part of the quotient rule:
+        dmetCostdX(obj.idx.dur) = dmetCostdX(obj.idx.dur) - ((metRate + 1) / (speed^2)) * (-speed / T); 
+    end
+    
+    % Final step: Apply Chain Rule for Exponents uniformly across functions and gradients
+    if strcmp(string(exponent), "log")
+        dmetRatedX = dmetRatedX / metRate;
+        dmetCostdX = dmetCostdX / metCost;
+        dCoTdX = dmetCostdX;
+        metRate = log(metRate);
+        metCost = log(metCost);
+        CoT = log(CoT);
+        metCostPerMus = log(metCostPerMus);
+    else
+        dmetRatedX = exponent * (metRate .^ (exponent-1)) .* dmetRatedX;
+        dmetCostdX = exponent * (metCost .^ (exponent-1)) .* dmetCostdX;
+        dCoTdX     = dmetCostdX / gravity^exponent;
+        metRate = metRate.^exponent;
+        metCost = metCost.^exponent;
+        CoT = CoT.^exponent;
+        metCostPerMus = metCostPerMus.^exponent;
+    end 
 end
-
 
 end
 

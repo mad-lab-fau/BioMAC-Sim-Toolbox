@@ -18,7 +18,8 @@
 %>                       and 'speed' of the model
 %> @param name           (optional) name of the model to be used, defaults to lichtwark
 %> @param epsilon        (optional) level of nonlinearity, defaults to 10^-3
-%> @param exponent       (optional) Positive integer: Exponent of energy rate in optimization
+%> @param exponent       (optional) Positive integer: Exponent of energy
+%rate in optimization or "log" for log-transform
 %> @retval output        Objective values for input option 'objval' or vector
 %>                       with gradient for input option 'gradient'
 %======================================================================
