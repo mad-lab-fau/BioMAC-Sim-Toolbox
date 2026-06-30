@@ -80,16 +80,21 @@ A_am = real(A.^0.6);
 F_iso1 = (l_ce <= 1)+F_iso.*(l_ce > 1);
 
 % Nominal value
-Nh_am = 25.*(act<=(1-FT))+(128*FT+25).*(act>(1-FT));
+act_FT_diff = act - (1-FT);
+act_FT_smooth = 0.5 * (1 + act_FT_diff ./ sqrt(act_FT_diff.^2 + epsilon^2));
+Nh_am = 25 + 128*FT .* act_FT_smooth;
 h_am = (0.4*Nh_am+0.6*Nh_am.*F_iso1).*A_am*S;
 
 % Shortening-Lengthening energy
 alpha_ST = 100./v_cemaxst;
-alpha_FT = 153./v_cemaxft.*(act > 1-FT); %Zero when activation is less than %ST fibers
+alpha_FT = 153./v_cemaxft .* act_FT_smooth;
 alpha_L = 0.3*alpha_ST;
 
 % Nominal value
-Nh_sl = alpha_L.*v_ce_l + (100*(alpha_ST.*v_cemaxst<-alpha_ST.*v_ce_s.*(1-FT))-alpha_ST.*v_ce_s.*(1-FT).*(alpha_ST.*v_cemaxst > -alpha_ST.*v_ce_s.*(1-FT))-alpha_FT.*v_ce_s.*FT);
+a_min = 100;
+b_min = -alpha_ST .* v_ce_s .* (1-FT);
+min_val = 0.5 * (a_min + b_min - sqrt((a_min - b_min).^2 + epsilon^2));
+Nh_sl = alpha_L .* v_ce_l + (min_val - alpha_FT .* v_ce_s .* FT);
 
 A2 = A.^(2.0);%A2 = A.*(v_ce > 0)+ A.^(2.0).*(v_ce <=0);%
 % vbarfunc = tanh(v_ce);%v_ce./sqrt(1+v_ce.^2);
@@ -138,7 +143,9 @@ if nargout > 1
         dham_dxi(:,i) = 0.6*S*dFiso1_dxi(:,i).*(A_am.*Nh_am)+S*dAam_dxi(:,i).*(0.4*Nh_am+0.6*F_iso1.*Nh_am);
     end
     dham_dlce = A_am*S*0.6.*Nh_am.*dFiso1_dlce+(0.4*Nh_am+0.6*F_iso1.*Nh_am)*S.*dAam_dlce;
-    dham_dact = A_am*S*0.6.*Nh_am.*dFiso1_dact+(0.4*Nh_am+0.6*F_iso1.*Nh_am)*S.*dAam_dact;
+    dactFT_dact = 0.5 * epsilon^2 ./ (act_FT_diff.^2 + epsilon^2).^1.5;
+    dNham_dact = 128*FT .* dactFT_dact;
+    dham_dact = A_am*S*0.6.*Nh_am.*dFiso1_dact + dNham_dact.*(0.4+0.6*F_iso1).*A_am*S + (0.4*Nh_am+0.6*F_iso1.*Nh_am)*S.*dAam_dact;
     dham_dstim = A_am*S*0.6.*Nh_am.*dFiso1_dstim+(0.4*Nh_am+0.6*F_iso1.*Nh_am)*S.*dAam_dstim;
 
     dFce_dxi = dFdx([obj.extractState('q'); obj.extractState('qdot')] ,:)';
@@ -154,9 +161,8 @@ if nargout > 1
     dv_ce_sdvce = 1/2.*(1-v_ce./sqrt((-v_ce).^2+epsilon^2));
 
     % Nominal value
-    % Nh_sl = alpha_L.*v_ce_l + (100*(alpha_ST.*v_cemaxst<-alpha_ST.*v_ce_s.*(1-FT))-alpha_ST.*v_ce_s.*(1-FT).*(alpha_ST.*v_cemaxst > -alpha_ST.*v_ce_s.*(1-FT))-alpha_FT.*v_ce_s.*FT);
-    Nh_sl = alpha_L.*v_ce_l + (100*(alpha_ST.*v_cemaxst<-alpha_ST.*v_ce_s.*(1-FT))-alpha_ST.*v_ce_s.*(1-FT).*(alpha_ST.*v_cemaxst > -alpha_ST.*v_ce_s.*(1-FT))-alpha_FT.*v_ce_s.*FT);
-    dNhsl_dvce = alpha_L.*dv_ce_ldvce - alpha_ST.*dv_ce_sdvce.*(1-FT).*(alpha_ST.*v_cemaxst > -alpha_ST.*v_ce_s.*(1-FT)) - alpha_FT.*FT.*dv_ce_sdvce;
+    dmin_dvces = 0.5 * (1 + (a_min - b_min) ./ sqrt((a_min - b_min).^2 + epsilon^2)) .* (-alpha_ST .* (1-FT));
+    dNhsl_dvce = alpha_L .* dv_ce_ldvce + (dmin_dvces - alpha_FT .* FT) .* dv_ce_sdvce;
 
     %A2 = A.^(2.0);
     dA2_dxi = 2*bsxfun(@times,dA_dxi,A);
@@ -176,7 +182,9 @@ if nargout > 1
     for i=1:(nDofs*2)
         dhsl_dxi(:,i) = dAsl_dxi(:,i).*Nh_sl.*F_iso1+dFiso1_dxi(:,i).*Nh_sl.*A_sl*S;
     end
-    dhsl_dact = Nh_sl.*dAsl_dact*S.*F_iso1+Nh_sl.*A_sl*S.*dFiso1_dact;
+    dalphaFT_dact = 153./v_cemaxft .* dactFT_dact;
+    dNhsl_dact = -dalphaFT_dact .* v_ce_s .* FT;
+    dhsl_dact = Nh_sl.*dAsl_dact*S.*F_iso1 + dNhsl_dact.*A_sl*S.*F_iso1 + Nh_sl.*A_sl*S.*dFiso1_dact;
     dhsl_dlce = Nh_sl.*dAsl_dlce*S.*F_iso1+Nh_sl.*A_sl*S.*dFiso1_dlce;
     dhsl_dvce = A_sl*S.*F_iso1.*dNhsl_dvce;
     dhsl_dstim = Nh_sl.*dAsl_dstim*S.*F_iso1+Nh_sl.*A_sl*S.*dFiso1_dstim;
