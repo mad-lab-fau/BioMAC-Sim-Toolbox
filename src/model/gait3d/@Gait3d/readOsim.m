@@ -66,7 +66,7 @@ opensimVersion45 = '4.5';
 
 % basic model parameters
 model.osim.name = char(Mod.getName());
-save_path = osim_path(strfind(char(Mod.getInputFileName()), 'model')-1:end);
+save_path = which(osim_path);%osim_path(strfind(char(Mod.getInputFileName()), 'model')-1:end);
 model.osim.file = save_path;
 file = dir(char(Mod.getInputFileName()));
 model.osim.modified = file.date;

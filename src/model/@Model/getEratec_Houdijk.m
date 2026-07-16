@@ -73,7 +73,8 @@ numax = k3+k4.*act;
 
 F_iso = exp(-(l_ce-1).^2./width.^2); % Force length relationship
 
-g = mmass.*barg .* nu .*(1-exp(-0.25-18.2./(nu.*numax)))./(1-exp(-0.25-18.2./numax));
+denom_g = nu .* numax + 1e-8;
+g = mmass.*barg .* nu .*(1-exp(-0.25-18.2./denom_g))./(1-exp(-0.25-18.2./numax));
 h = mmass.*(barg+barh).*act.*(F_iso-barg./(barg+barh));
 v_ce_s = 1/2*(v_ce-sqrt((-v_ce).^2+epsilon^2)).*l_ceopt; %shortening velocity
 s = bara.*act.*F_iso.*-v_ce_s;
@@ -102,10 +103,10 @@ if nargout > 1
     % g = mmass.*barg .* nu .*(1-exp(-0.25-18.2./(nu.*numax)))./(1-exp(-0.25-18.2./numax));
     dg_dxi = zeros(obj.nMus,obj.nDofs*2);
     dg_dlce = zeros(obj.nMus,1);
-    dg_dact = mmass.*barg.*dnu_dact.*(1-exp(-0.25-18.2./(nu.*numax)))./(1-exp(-0.25-18.2./numax)) ...
-        -mmass.*barg.*(18.2*exp(-0.25-18.2./(nu.*numax))./(nu.*numax)./(1-exp(-0.25-18.2./numax))).*dnu_dact ...
-        -mmass.*barg.*nu.*(18.2*exp(-0.25-18.2./(nu.*numax))./(nu.*numax.^2)./(1-exp(-0.25-18.2./numax))).*dnumax_dact ...
-        +mmass.*barg.*nu*18.2.*(1-exp(-0.25-18.2./(nu.*numax))).*exp(-0.25-18.2./numax)./(numax.^2.*(1-exp(-0.25-18.2./numax)).^2).*dnumax_dact;
+    dg_dact = mmass.*barg.*dnu_dact.*(1-exp(-0.25-18.2./denom_g))./(1-exp(-0.25-18.2./numax)) ...
+        -mmass.*barg.*(18.2*exp(-0.25-18.2./denom_g)./(denom_g)./(1-exp(-0.25-18.2./numax))).*dnu_dact ...
+        -mmass.*barg.*nu.*(18.2*exp(-0.25-18.2./denom_g)./(denom_g.*numax)./(1-exp(-0.25-18.2./numax))).*dnumax_dact ...
+        +mmass.*barg.*nu*18.2.*(1-exp(-0.25-18.2./denom_g)).*exp(-0.25-18.2./numax)./(numax.^2.*(1-exp(-0.25-18.2./numax)).^2).*dnumax_dact;
 
     % h = mmass.*(barg+barh).*a.*(F_iso-barg./(barg+barh));
     dh_dxi = bsxfun(@times,mmass.*(barg+barh).*act,dFiso_dxi);

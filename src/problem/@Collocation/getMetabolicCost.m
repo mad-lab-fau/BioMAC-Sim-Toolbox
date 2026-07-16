@@ -92,20 +92,70 @@ nMus     = obj.model.nMus;              % Number of muscles
 nNodes   = obj.nNodes;                  % Number of nodes of the colocation problem
 nNodesDur= obj.nNodesDur;               % Number of nodes defining the duration
 T        = X(obj.idx.dur);              % Duration of movement
-h        = T/(nNodesDur-1);             % Duration of time step
-if isfield(obj.idx,'speed')
-    speed    = norm(X(obj.idx.speed));            % Speed in forward direction in m/s
-else
-    deltaX = sum(abs(diff(X(obj.idx.states(obj.model.extractState('q', 'pelvis_tx'), :)))));
-    if isa(obj.model, 'Gait3d')
-        deltaZ = sum(abs(diff(X(obj.idx.states(obj.model.extractState('q', 'pelvis_tz'), :)))));
+
+% Determine if we are using the new dynamicPeriodicConstraints (where optimization nodes = N)
+is_combined_periodic = isfield(obj.constraintTerms, 'name') && any(strcmp({obj.constraintTerms.name}, 'dynamicPeriodicConstraints'));
+if is_combined_periodic
+    % Find sym from dynamicPeriodicConstraints
+    iCon = find(strcmp({obj.constraintTerms.name}, 'dynamicPeriodicConstraints'), 1);
+    sym = obj.constraintTerms(iCon).varargin{1};
+    
+    if isfield(obj.idx,'speed')
+        speed = norm(X(obj.idx.speed));
     else
-        deltaZ = 0;
+        speed = 0; 
     end
-    speed = (deltaX + deltaZ) / T;
+    
+    % Reconstruct states and controls with the virtual node N+1 appended
+    states_orig = X(obj.idx.states);
+    controls_orig = X(obj.idx.controls);
+    
+    x1_first = states_orig(:, 1);
+    u1_first = controls_orig(:, 1);
+    
+    unitdisplacementx = zeros(size(x1_first));
+    unitdisplacementx(obj.model.idxForward) = 1;
+    unitdisplacementz = zeros(size(x1_first));
+    unitdisplacementz(obj.model.idxSideward) = 1;
+    
+    displacementx = unitdisplacementx * T * X(obj.idx.speed(1));
+    if numel(X(obj.idx.speed)) > 1
+        displacementz = unitdisplacementz * T * X(obj.idx.speed(2));
+    else
+        displacementz = 0;
+    end
+    
+    if sym
+        x_virtual = obj.model.idxSymmetry.xsign .* x1_first(obj.model.idxSymmetry.xindex) + displacementx + displacementz;
+        u_virtual = obj.model.idxSymmetry.usign .* u1_first(obj.model.idxSymmetry.uindex);
+    else
+        x_virtual = x1_first + displacementx + displacementz;
+        u_virtual = u1_first;
+    end
+    
+    states = [states_orig, x_virtual];
+    controls = [controls_orig, u_virtual];
+    nNodesDur = nNodes + 1;
+    h = T / nNodes;
+else
+    states = X(obj.idx.states);
+    controls = X(obj.idx.controls);
+    h        = T/(nNodesDur-1);             % Duration of time step
+    if isfield(obj.idx,'speed')
+        speed    = norm(X(obj.idx.speed));            % Speed in forward direction in m/s
+    else
+        deltaX = sum(abs(diff(X(obj.idx.states(obj.model.extractState('q', 'pelvis_tx'), :)))));
+        if isa(obj.model, 'Gait3d')
+            deltaZ = sum(abs(diff(X(obj.idx.states(obj.model.extractState('q', 'pelvis_tz'), :)))));
+        else
+            deltaZ = 0;
+        end
+        speed = (deltaX + deltaZ) / T;
+    end
 end
 
-% Initialize paremeters
+% Initialize parameters
+statesd = ( states(:, 2:nNodesDur) - states(:, 1:(nNodesDur-1)) ) / h;
 Edot = zeros(nMus, nNodesDur-1);
 
 %Find stimulation time for the entire gait cycle
@@ -121,9 +171,6 @@ if ismember(nargout,[0 1 3 4 5])
 
 
     % Compute the energy for all nodes
-    states = X(obj.idx.states);
-    statesd = ( states(:, 2:nNodesDur) - states(:, 1:(nNodesDur-1)) ) / h;
-    controls = X(obj.idx.controls);
     for iNode = 1 : nNodesDur-1
         % Get states and controls
         % (See Collocation.dynamicConstraints as reference)
@@ -165,9 +212,6 @@ if ismember(nargout,[0 1 3 4 5])
 %% Calculate gradients only if they are needed:
 else
     dmetRatedX = zeros(size(X)); 
-    states = X(obj.idx.states);
-    statesd = ( states(:, 2:nNodesDur) - states(:, 1:(nNodesDur-1)) ) / h;
-    controls = X(obj.idx.controls);
     for iNode = 1 : nNodesDur-1
         curStates = states(:, iNode);
         [Edot(:, iNode), dEdotdx, dEdotdu, dEdotdxdot] = obj.model.getMetabolicRate_pernode(curStates, statesd(:, iNode), controls(:,iNode), t_stim(:,iNode), name, getCont, epsilon);
@@ -175,7 +219,35 @@ else
         dmetRatedX(obj.idx.states(:, iNode))   = dmetRatedX(obj.idx.states(:, iNode))   + dEdotdx;
         dmetRatedX(obj.idx.controls(:, iNode)) = dmetRatedX(obj.idx.controls(:, iNode)) + dEdotdu;
         dmetRatedX(obj.idx.states(:, iNode))   = dmetRatedX(obj.idx.states(:, iNode))   - dEdotdxdot/h;
-        dmetRatedX(obj.idx.states(:, iNode+1)) = dmetRatedX(obj.idx.states(:, iNode+1)) + dEdotdxdot/h;
+        
+        if is_combined_periodic && iNode == nNodesDur-1
+            % Last node N+1 is virtual (reconstructed from node 1)
+            dfdxdot_term = dEdotdxdot/h;
+            if sym
+                dfdxdot_mapped = zeros(size(dfdxdot_term));
+                dfdxdot_mapped(obj.model.idxSymmetry.xindex) = dfdxdot_term .* obj.model.idxSymmetry.xsign;
+            else
+                dfdxdot_mapped = dfdxdot_term;
+            end
+            dmetRatedX(obj.idx.states(:, 1)) = dmetRatedX(obj.idx.states(:, 1)) + dfdxdot_mapped;
+            
+            % Gradient w.r.t duration and speed via displacement offset in virtual node
+            ddisp_dT = unitdisplacementx * X(obj.idx.speed(1));
+            if numel(X(obj.idx.speed)) > 1
+                ddisp_dT = ddisp_dT + unitdisplacementz * X(obj.idx.speed(2));
+            end
+            dmetRatedX(obj.idx.dur) = dmetRatedX(obj.idx.dur) + sum((dEdotdxdot/h) .* ddisp_dT);
+            
+            ddisp_dspeed1 = unitdisplacementx * T;
+            dmetRatedX(obj.idx.speed(1)) = dmetRatedX(obj.idx.speed(1)) + sum((dEdotdxdot/h) .* ddisp_dspeed1);
+            if numel(X(obj.idx.speed)) > 1
+                ddisp_dspeed2 = unitdisplacementz * T;
+                dmetRatedX(obj.idx.speed(2)) = dmetRatedX(obj.idx.speed(2)) + sum((dEdotdxdot/h) .* ddisp_dspeed2);
+            end
+        else
+            dmetRatedX(obj.idx.states(:, iNode+1)) = dmetRatedX(obj.idx.states(:, iNode+1)) + dEdotdxdot/h;
+        end
+        
         dmetRatedX(obj.idx.dur)                = dmetRatedX(obj.idx.dur)                - sum(dEdotdxdot.*statesd(:, iNode))/h/(nNodesDur-1);
     end
     
