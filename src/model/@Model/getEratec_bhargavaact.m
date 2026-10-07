@@ -1,17 +1,17 @@
 %======================================================================
-%> @file @Model/getEratec_bhargava.m
+%> @file @Model/getEratec_bhargavaact.m
 %> @brief Model function to calculate the energy rate of a single time
 %> step with the continuous version of Bhargava et al.'s model
 %> @details
-%> Details: Model::getEratec_bhargava()
+%> Details: Model::getEratec_bhargavaact()
 %>
-%> @author Anne Koelewijn
-%> @date July, 2021
+%> @author Anne Koelewijn, Markus Gambietz
+%> @date August, 2026
 %======================================================================
 %======================================================================
 %> @brief Model function to calculate the energy rate of a single time
 %> step using a continuous version of Bhargava et al.'s model
-%>
+%> This version uses the activation as input instead of the stimulation, which is more suitable for optimization problems.
 %>
 %> @details
 %> Function to calculate the energy rate at a single time step using
@@ -39,7 +39,7 @@
 
 %======================================================================
 
-function [Edot,dEdot] = getEratec_bhargava(obj, F_ce, stim, act, l_ce, v_ce, dFdx, dFdxdot,epsilon)
+function [Edot,dEdot] = getEratec_bhargavaact(obj, F_ce, stim, act, l_ce, v_ce, dFdx, dFdxdot,epsilon)
 
 % Define variables
 rho   = 1059.7;   % Muscle density
@@ -64,15 +64,15 @@ A_s = 40;  %W/kg
 M_f = 111; %W/kg
 M_s = 74;  %W/kg
 
-u_f = 1-cos(pi/2*stim);
-u_s = sin(pi/2*stim);
+u_f = 1-cos(pi/2*act);
+u_s = sin(pi/2*act);
 
-% Extend the activation-like terms smoothly beyond stim = 1 so they
-% continue to rise without introducing a kink at full stimulation.
-idx = stim > 1;
-delta = max(stim - 1, 0);
-u_f = 1 - cos(pi/2*min(stim, 1)) + (pi/2)*delta + delta.^2;
-u_s = sin(pi/2*min(stim, 1)) + delta.^2;
+% Extend the activation-like terms smoothly beyond act = 1 so they
+% continue to rise without introducing a kink at full activation.
+idx = act > 1;
+delta = max(act - 1, 0);
+u_f = 1 - cos(pi/2*min(act, 1)) + (pi/2)*delta + delta.^2;
+u_s = sin(pi/2*min(act, 1)) + delta.^2;
 
 phi = 0.2;%0.06+exp(-t_stim.*u/tau_phi);
 F_iso = exp(-(l_ce-1).^2./width.^2); % Force length relationship
@@ -112,12 +112,12 @@ if nargout > 1
     dFce_dstim = zeros(obj.nMus,1);
 
     %u_f = 1-cos(pi/2*u);
-    duf_dstim = zeros(size(stim));
-    dus_dstim = zeros(size(stim));
-    duf_dstim(~idx) = pi/2*sin(pi/2*stim(~idx));
-    dus_dstim(~idx) = pi/2*cos(pi/2*stim(~idx));
-    duf_dstim(idx) = pi/2 + 2*delta(idx);
-    dus_dstim(idx) = 2*delta(idx);
+    duf_dact = zeros(size(act));
+    dus_dact = zeros(size(act));
+    duf_dact(~idx) = pi/2*sin(pi/2*act(~idx));
+    dus_dact(~idx) = pi/2*cos(pi/2*act(~idx));
+    duf_dact(idx) = pi/2 + 2*delta(idx);
+    dus_dact(idx) = 2*delta(idx);
     duf_dlce = zeros(obj.nMus,1);
     dus_dlce = zeros(obj.nMus,1);
 
@@ -126,9 +126,9 @@ if nargout > 1
 
     %A = phi.*mmass.*(FT*A_f.*u_f+ST*A_s.*u_s);
     dA_dxi = zeros(obj.nMus,obj.nDofs*2);%phi.*mmass.*(FT*A_f.*duf_dxi+ST*A_s.*dus_dxi);
-    dA_dact = dphi_dact.*mmass.*(FT*A_f.*u_f+ST*A_s.*u_s);
+    dA_dact = phi.*mmass.*(FT*A_f.*duf_dact+ST*A_s.*dus_dact);
     dA_dlce = phi.*mmass.*(FT*A_f.*duf_dlce+ST*A_s.*dus_dlce);
-    dA_dstim = phi.*mmass.*(FT*A_f.*duf_dstim+ST*A_s.*dus_dstim);
+    dA_dstim = zeros(obj.nMus,1);
 
     dlm1_dlce = 1/2*(1+(l_ce-0.5)./sqrt((l_ce-0.5).^2+epsilon^2));
     dlm2_dlce = -(1+(-2*l_ce+3)./sqrt((-2*l_ce+3).^2+epsilon^2));
@@ -136,15 +136,16 @@ if nargout > 1
 
     %M = lM.*mmass.*(FT*M_f.*u_f+ST*M_s.*u_s);
     dM_dxi = zeros(obj.nMus,obj.nDofs*2);%lM.*mmass.*(FT*M_f.*duf_dxi+ST*M_s.*dus_dxi);
-    dM_dstim = lM.*mmass.*(FT*M_f.*duf_dstim+ST*M_s.*dus_dstim);
+    dM_dact = lM.*mmass.*(FT*M_f.*duf_dact+ST*M_s.*dus_dact);
+    dM_dstim = zeros(obj.nMus,1);
     dM_dlce = lM.*mmass.*(FT*M_f.*duf_dlce+ST*M_s.*dus_dlce)+dlM_dlce.*mmass.*(FT*M_f.*u_f+ST*M_s.*u_s);
 
     %alpha_l = 0.16*a.*F_iso.*F_max+0.18*F_ce; %for lengthening
     dalphal_dxi = 0.18*dFce_dxi;
-    dalphal_dact = 0.16*F_iso.*fmax+0.18*dFce_dact;
+    dalphal_dact = 0.16*F_iso.*fmax + 0.18*dFce_dact;
     dalphal_dlce = 0.16*act.*dFiso_dlce.*fmax+0.18*dFce_dlce;
     dalphal_dvce = 0.18*dFce_dvce;
-    dalphal_dstim = 0.18*dFce_dstim;
+    dalphal_dstim = zeros(obj.nMus,1);
 
     %alpha_s = 0.157*F_ce; %for shortening
     dalphas_dxi = 0.157*dFce_dxi;
@@ -181,7 +182,7 @@ if nargout > 1
     dW_dstim = dwce_dwcebar.*dwbar_dstim;
 
     dEdot_dxi = dA_dxi+dM_dxi+dS_dxi+dW_dxi;
-    dEdot_dact = dA_dact+dS_dact+dW_dact;
+    dEdot_dact = dA_dact+dM_dact+dS_dact+dW_dact;
     dEdot_dlce = dA_dlce+dM_dlce+dS_dlce+dW_dlce;
     dEdot_dstim = dA_dstim+ dM_dstim+dS_dstim+dW_dstim;
     dEdot_dvce = dS_dvce+dW_dvce;

@@ -86,6 +86,8 @@ elseif nargout ==1
             Edot = obj.getEratec_umberger(F_ce, stim, act, l_ce, v_ce, Fce_dx, Fce_dxdot, epsilon);
         case 'bhargava'
             Edot = obj.getEratec_bhargava(F_ce, stim, act, l_ce, v_ce, Fce_dx, Fce_dxdot,epsilon);
+        case 'bhargavaact'
+            Edot = obj.getEratec_bhargavaact(F_ce, stim, act, l_ce, v_ce, Fce_dx, Fce_dxdot,epsilon);
         case 'houdijk'
             Edot = obj.getEratec_Houdijk(F_ce, act, l_ce, v_ce, Fce_dx, Fce_dxdot, epsilon);
         case 'lichtwark'
@@ -107,6 +109,8 @@ else
             [Edot, dEdot] = obj.getEratec_umberger(F_ce, stim, act, l_ce, v_ce, Fce_dx, Fce_dxdot, epsilon);
         case 'bhargava'
             [Edot, dEdot] = obj.getEratec_bhargava(F_ce, stim, act, l_ce, v_ce, Fce_dx, Fce_dxdot,epsilon);
+        case 'bhargavaact'
+            [Edot, dEdot] = obj.getEratec_bhargavaact(F_ce, stim, act, l_ce, v_ce, Fce_dx, Fce_dxdot,epsilon);
         case 'houdijk'
             [Edot, dEdot] = obj.getEratec_Houdijk(F_ce, act, l_ce, v_ce, Fce_dx, Fce_dxdot, epsilon);
         case 'lichtwark'

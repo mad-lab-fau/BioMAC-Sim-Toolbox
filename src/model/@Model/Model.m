@@ -20,6 +20,10 @@ classdef (Abstract) Model < handle
         %> Double: Showing if the mex model is initialized 
         init
     end
+
+    properties
+        controls
+    end
     
     properties (Constant)
         %> Cell array with string: Gives the names for the GRF vector
@@ -72,7 +76,7 @@ classdef (Abstract) Model < handle
         %> Table: Information on states of the model
     	states    
         %> Table: Information on controls of the model
-        controls
+        
         %> Table: Information on constraints implemented in the mex and here
         constraints
         %> Double: Number of states (height of Model.states)

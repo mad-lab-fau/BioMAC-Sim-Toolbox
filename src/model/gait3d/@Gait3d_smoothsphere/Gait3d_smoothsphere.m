@@ -1,5 +1,6 @@
 classdef Gait3d_smoothsphere < Gait3d
     
+    
     methods
         function obj = Gait3d_smoothsphere(varargin)
             % Call superclass constructor to initialize standard properties
